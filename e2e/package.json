@@ -1,0 +1,13 @@
+{
+  "name": "condobuddy2-e2e",
+  "version": "1.0.0",
+  "description": "CondoBuddy2 E2E Tests with Cypress",
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test": "cypress run"
+  },
+  "devDependencies": {
+    "cypress": "^13.0.0"
+  }
+}

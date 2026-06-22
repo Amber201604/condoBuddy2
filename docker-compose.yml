@@ -1,0 +1,192 @@
+version: "3.9"
+
+services:
+  # Core Async Backend
+  core:
+    build: ./core
+    container_name: condobuddy2-core
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://condobuddy:condobuddy@postgres:5432/condobuddy2
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_BUCKET=condobuddy2
+      - FRAPPE_BASE_URL=http://frappe:8080
+      - NVR_BASE_URL=http://nvr-connector:8001
+      - MQTT_BROKER_HOST=mqtt
+      - MQTT_BROKER_PORT=1883
+      - SECRET_KEY=change-me-in-production-condobuddy2-secret-key-2024
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=10080
+    depends_on:
+      - postgres
+      - redis
+      - minio
+    networks:
+      - condobuddy2
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: condobuddy2-postgres
+    environment:
+      - POSTGRES_USER=condobuddy
+      - POSTGRES_PASSWORD=condobuddy
+      - POSTGRES_DB=condobuddy2
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - condobuddy2
+    restart: unless-stopped
+
+  # Redis (Cache + Celery + WebSocket pub/sub)
+  redis:
+    image: redis:7-alpine
+    container_name: condobuddy2-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - condobuddy2
+    restart: unless-stopped
+
+  # MinIO (Object Storage for snapshots/recordings)
+  minio:
+    image: minio/minio:latest
+    container_name: condobuddy2-minio
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - condobuddy2
+    restart: unless-stopped
+
+  # Celery Worker
+  celery:
+    build: ./core
+    container_name: condobuddy2-celery
+    command: celery -A app.tasks worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://condobuddy:condobuddy@postgres:5432/condobuddy2
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - condobuddy2
+    restart: unless-stopped
+
+  # NVR Connector (RTSP Stream Proxy)
+  nvr-connector:
+    build: ./nvr-connector
+    container_name: condobuddy2-nvr
+    ports:
+      - "8001:8001"
+    networks:
+      - condobuddy2
+    restart: unless-stopped
+
+  # MariaDB for Frappe
+  mariadb:
+    image: mariadb:10.6
+    container_name: condobuddy2-mariadb
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+      - --skip-innodb-read-only-compressed
+    environment:
+      - MYSQL_ROOT_PASSWORD=condobuddy_mariadb_root
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./frappe/docker/mariadb.cnf:/etc/mysql/conf.d/mariadb.cnf
+    networks:
+      - condobuddy2
+    restart: unless-stopped
+
+  # Frappe/ERPNext (Management Portal + Resident Web UI)
+  frappe:
+    build: ./frappe
+    container_name: condobuddy2-frappe
+    ports:
+      - "8080:8080"
+    environment:
+      - MARIADB_ROOT_PASSWORD=condobuddy_mariadb_root
+      - CORE_BACKEND_URL=http://core:8000
+      - FRAPPE_SITE_NAME=condobuddy2.local
+    volumes:
+      - frappe_sites:/home/frappe/frappe-bench/sites
+      - frappe_logs:/home/frappe/frappe-bench/logs
+    depends_on:
+      - mariadb
+      - redis
+    networks:
+      - condobuddy2
+    restart: unless-stopped
+
+  frappe-bridge:
+    build: ./frappe-bridge
+    container_name: condobuddy2-frappe-bridge
+    ports:
+      - "8002:8002"
+    environment:
+      - FRAPPE_BASE_URL=http://frappe:8080
+      - FRAPPE_API_KEY=${FRAPPE_API_KEY:-}
+      - FRAPPE_API_SECRET=${FRAPPE_API_SECRET:-}
+      - CORE_BASE_URL=http://core:8000
+    networks:
+      - condobuddy2
+    restart: unless-stopped
+
+  # MQTT Broker (for IoT sensors)
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: condobuddy2-mqtt
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - condobuddy2
+    restart: unless-stopped
+
+  # Frappe Bridge (Sync service — connects Frappe ↔ FastAPI)
+  frappe-bridge:
+    build: ./frappe-bridge
+    container_name: condobuddy2-frappe-bridge
+    ports:
+      - "8002:8002"
+    environment:
+      - FRAPPE_BASE_URL=http://frappe:8080
+      - FRAPPE_API_KEY=${FRAPPE_API_KEY:-}
+      - FRAPPE_API_SECRET=${FRAPPE_API_SECRET:-}
+      - CORE_BASE_URL=http://core:8000
+    networks:
+      - condobuddy2
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  minio_data:
+  mariadb_data:
+  frappe_sites:
+  frappe_logs:
+
+networks:
+  condobuddy2:
+    driver: bridge

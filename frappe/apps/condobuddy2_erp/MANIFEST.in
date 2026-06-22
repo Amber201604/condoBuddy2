@@ -1,0 +1,3 @@
+include condobuddy2_erp/public/**/*
+include condobuddy2_erp/templates/**/*
+include condobuddy2_erp/www/**/*

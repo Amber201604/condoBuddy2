@@ -1,0 +1,114 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:CCTV-{YYYY}-{#####}",
+ "creation": "2026-06-22 10:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "camera_id",
+  "camera_location",
+  "column_break_1",
+  "timestamp",
+  "event_type",
+  "section_break_1",
+  "snapshot_url",
+  "video_clip_url",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "camera_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Camera ID",
+   "reqd": 1
+  },
+  {
+   "fieldname": "camera_location",
+   "fieldtype": "Data",
+   "label": "Camera Location"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Now",
+   "fieldname": "timestamp",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Timestamp",
+   "reqd": 1
+  },
+  {
+   "fieldname": "event_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Event Type",
+   "options": "Motion Detected\nOffline\nOnline\nLow Quality\nTamper\nOther",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "snapshot_url",
+   "fieldtype": "Data",
+   "label": "Snapshot URL"
+  },
+  {
+   "fieldname": "video_clip_url",
+   "fieldtype": "Data",
+   "label": "Video Clip URL"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "Notes"
+  }
+ ],
+ "links": [],
+ "modified": "2026-06-22 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "CondoBuddy2 ERP",
+ "name": "CCTV Alert",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Property Manager",
+   "share": 0,
+   "write": 0
+  },
+  {
+   "read": 1,
+   "role": "Resident"
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
