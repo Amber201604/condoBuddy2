@@ -165,22 +165,7 @@ services:
       - condobuddy2
     restart: unless-stopped
 
-  # Frappe Bridge (Sync service — connects Frappe ↔ FastAPI)
-  frappe-bridge:
-    build: ./frappe-bridge
-    container_name: condobuddy2-frappe-bridge
-    ports:
-      - "8002:8002"
-    environment:
-      - FRAPPE_BASE_URL=http://frappe:8080
-      - FRAPPE_API_KEY=${FRAPPE_API_KEY:-}
-      - FRAPPE_API_SECRET=${FRAPPE_API_SECRET:-}
-      - CORE_BASE_URL=http://core:8000
-    networks:
-      - condobuddy2
-    restart: unless-stopped
 
-volumes:
   postgres_data:
   minio_data:
   mariadb_data:
