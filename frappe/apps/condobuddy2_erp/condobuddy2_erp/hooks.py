@@ -20,15 +20,10 @@ website_context = {
 # on_session_creation = "condobuddy2_erp.api.boot.boot_session"
 
 # DocType Events
-doc_events = {
-    "Facility Booking": {
-        "on_submit": "condobuddy2_erp.doctype.facility_booking.facility_booking.on_submit",
-        "on_cancel": "condobuddy2_erp.doctype.facility_booking.facility_booking.on_cancel",
-    },
-    "Visitor": {
-        "on_update": "condobuddy2_erp.doctype.visitor.visitor.on_update",
-    }
-}
+# Lifecycle handlers (on_submit/on_cancel/on_update/validate) live directly on
+# the DocType controller classes, so Frappe invokes them automatically. No
+# additional doc_events wiring is needed here.
+doc_events = {}
 
 # Scheduled Tasks
 # scheduler_events = {

@@ -2,54 +2,57 @@
 set -e
 
 FRAPPE_BENCH_DIR=/home/frappe/frappe-bench
-BENCH_NAME="condobuddy2"
-SITE_NAME="condobuddy2.local"
+SITE_NAME="${FRAPPE_SITE_NAME:-condobuddy2.local}"
+MARIADB_HOST="${MARIADB_HOST:-mariadb}"
+MARIADB_ROOT_PASSWORD="${MARIADB_ROOT_PASSWORD:-condobuddy_mariadb_root}"
+ADMIN_PASSWORD="${FRAPPE_ADMIN_PASSWORD:-admin}"
+CORE_BACKEND_URL="${CORE_BACKEND_URL:-http://core:8000}"
 
-# Initialize bench if not exists
-if [ ! -d "$FRAPPE_BENCH_DIR/sites" ]; then
-    echo "Initializing Frappe bench..."
-    bench init --skip-redis-config-generation --frappe-branch version-15 $FRAPPE_BENCH_DIR
-    
-    cd $FRAPPE_BENCH_DIR
-    
-    # Add custom app
-    bench --site $SITE_NAME get-app $FRAPPE_BENCH_DIR/apps/condobuddy2_erp
-    
-    # Create site
-    bench new-site $SITE_NAME --mariadb-root-password $MARIADB_ROOT_PASSWORD --admin-password admin
-    
-    # Install app on site
-    bench --site $SITE_NAME install-app condobuddy2_erp
-    
-    # Enable site
-    bench use $SITE_NAME
-    
-    # Set config for core backend URL
-    bench --site $SITE_NAME set-config condobuddy_core_url "${CORE_BACKEND_URL:-http://core:8000}"
-    
-    # Add roles
-    bench --site $SITE_NAME add-role Resident
-    bench --site $SITE_NAME add-role Property Manager
+cd "$FRAPPE_BENCH_DIR"
+
+# Create the site on first boot. The bench itself (framework + custom app) is
+# already baked into the image; only the site needs a live MariaDB.
+if [ "$1" = "start" ] && [ ! -f "sites/$SITE_NAME/site_config.json" ]; then
+    echo "Waiting for MariaDB at ${MARIADB_HOST}:3306..."
+    until nc -z "$MARIADB_HOST" 3306; do
+        sleep 2
+    done
+    echo "MariaDB is reachable. Creating site ${SITE_NAME}..."
+
+    bench new-site "$SITE_NAME" \
+        --db-host "$MARIADB_HOST" \
+        --mariadb-root-password "$MARIADB_ROOT_PASSWORD" \
+        --admin-password "$ADMIN_PASSWORD" \
+        --no-mariadb-socket
+
+    bench use "$SITE_NAME"
+    bench --site "$SITE_NAME" set-config condobuddy_core_url "$CORE_BACKEND_URL"
+
+    echo "Installing condobuddy2_erp..."
+    bench --site "$SITE_NAME" install-app condobuddy2_erp \
+        || echo "WARN: install-app condobuddy2_erp failed; Frappe framework will still run."
+
+    # `add-role` is best-effort: roles are normally shipped with the app.
+    bench --site "$SITE_NAME" add-role "Resident" 2>/dev/null || true
+    bench --site "$SITE_NAME" add-role "Property Manager" 2>/dev/null || true
 fi
-
-cd $FRAPPE_BENCH_DIR
 
 case "$1" in
     start)
-        echo "Starting Frappe..."
-        bench start
+        echo "Starting Frappe (site: ${SITE_NAME})..."
+        exec bench start
         ;;
     migrate)
         echo "Running migrations..."
-        bench --site $SITE_NAME migrate
+        exec bench --site "$SITE_NAME" migrate
         ;;
     worker)
         echo "Starting worker..."
-        bench worker --queue default
+        exec bench worker --queue default
         ;;
     scheduler)
         echo "Starting scheduler..."
-        bench scheduler
+        exec bench scheduler
         ;;
     *)
         exec "$@"

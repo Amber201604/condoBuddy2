@@ -87,43 +87,64 @@ graph TB
 ### 1. Clone & Start
 
 ```bash
-git clone https://github.com/Amber201604/condoBuddy.git
+git clone https://github.com/Amber201604/condoBuddy2.git
 cd condobuddy2
 
 # Start all services
 docker-compose up -d
 
-# Wait for Frappe to initialize (first boot takes ~2-3 minutes)
+# Wait for Frappe to initialize. The first boot creates the site, installs the
+# custom app, and configures roles automatically (this can take several minutes).
 docker-compose logs -f frappe
 
 # Once ready, access:
-# Frappe Desk:    http://localhost:8080
+# Frappe Desk:     http://localhost:8080   (login: Administrator / admin)
 # Resident Portal: http://localhost:8080/resident-portal.html
-# FastAPI Docs:   http://localhost:8000/docs
-# FastAPI Health: http://localhost:8000/health
+# FastAPI Docs:    http://localhost:8000/docs
+# FastAPI Health:  http://localhost:8000/health
+# MinIO Console:   http://localhost:9001    (minioadmin / minioadmin)
 ```
 
-### 2. Configure Frappe
+Service ports:
+
+| Service | Host port | Notes |
+|---------|-----------|-------|
+| Core (FastAPI) | 8000 | API + Swagger docs |
+| Frappe | 8080 | Desk + Resident Portal |
+| Frappe Bridge | 8002 | Frappe ↔ Core sync |
+| PostgreSQL | 5432 | Core database |
+| Redis | 6379 | Cache / Celery / Frappe |
+| MinIO | 9000 (API), 9001 (console) | Object storage |
+| MQTT | 1883 (mqtt), 9883 (websockets) | IoT broker |
+
+### 2. Configure Frappe (automatic)
+
+The Frappe container's entrypoint performs first-boot setup for you on `docker-compose up`:
+
+- Creates the `condobuddy2.local` site (Administrator password: `admin`)
+- Installs the `condobuddy2_erp` app
+- Points the site at the Core backend (`condobuddy_core_url`)
+
+To re-run any of these manually (or to add more roles), exec into the container:
 
 ```bash
-# Enter Frappe container
 docker-compose exec frappe bash
-
-# Inside container:
 cd /home/frappe/frappe-bench
 bench --site condobuddy2.local install-app condobuddy2_erp
 bench --site condobuddy2.local set-config condobuddy_core_url "http://core:8000"
-
-# Create roles
-bench --site condobuddy2.local add-role "Resident"
-bench --site condobuddy2.local add-role "Property Manager"
 ```
 
-### 3. Run Migrations (Core Backend)
+### 3. Database Schema (Core Backend)
 
-```bash
-docker-compose run --rm core alembic upgrade head
-```
+The Core backend **auto-creates its PostgreSQL tables on startup** (via SQLAlchemy
+`create_all`), so no manual migration step is required for a fresh environment.
+
+> Note: Alembic is listed as a dependency but no migration scripts are wired up
+> yet. Once they exist, apply them with:
+>
+> ```bash
+> docker-compose run --rm core alembic upgrade head
+> ```
 
 ---
 
