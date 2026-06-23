@@ -165,7 +165,7 @@ services:
       - condobuddy2
     restart: unless-stopped
 
-
+volumes:
   postgres_data:
   minio_data:
   mariadb_data:
