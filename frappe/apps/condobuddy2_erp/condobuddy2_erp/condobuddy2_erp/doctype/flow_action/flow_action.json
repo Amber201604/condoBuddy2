@@ -1,0 +1,208 @@
+{
+ "actions": [],
+ "allow_copy": 1,
+ "allow_rename": 1,
+ "autoname": "format:{custom_flow_name}{custom_sub_flow_name}-{flow_step}-Action-{#}",
+ "creation": "2025-12-22 17:59:21.025493",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "custom_project_name",
+  "custom_flow_name",
+  "action_result",
+  "column_break_kfsg",
+  "step_name",
+  "action_date",
+  "section_break_oufp",
+  "comment",
+  "column_break_rupu",
+  "specifications",
+  "section_break_zeor",
+  "assigned_role",
+  "action_sign",
+  "section_break_gsto",
+  "attachment",
+  "hidden_backend_uses_only_tab",
+  "section_break_awrt",
+  "flow_step",
+  "action_type",
+  "reference_name",
+  "reference_doctype",
+  "attachment_mandatory",
+  "section_break_tlvp",
+  "custom_sub_flow_name"
+ ],
+ "fields": [
+  {
+   "fieldname": "custom_flow_name",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Task Flow",
+   "read_only": 1
+  },
+  {
+   "fieldname": "flow_step",
+   "fieldtype": "Int",
+   "label": "Flow Step",
+   "read_only": 1
+  },
+  {
+   "fieldname": "action_result",
+   "fieldtype": "Select",
+   "label": "\u6d41\u7a0b\u7ed3\u679c",
+   "options": "Pending\nApproved\nRejected\nCompleted",
+   "read_only_depends_on": "action_sign"
+  },
+  {
+   "fieldname": "column_break_kfsg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "user",
+   "fieldname": "assigned_role",
+   "fieldtype": "Link",
+   "label": "\u8d1f\u8d23\u4eba",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "step_name",
+   "fieldtype": "Data",
+   "label": "\u6b65\u9aa4\u540d\u79f0",
+   "read_only": 1
+  },
+  {
+   "default": "Now",
+   "fieldname": "action_date",
+   "fieldtype": "Datetime",
+   "label": "\u521b\u5efa\u65f6\u95f4",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_awrt",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "action_type",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Action Type",
+   "options": "Approve\nReject\nConfirm\nNotify\nReturn\nCustom",
+   "placeholder": "\u8bf7\u9009\u62e9"
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Reference Name"
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Reference Doctype",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "section_break_oufp",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "action_sign",
+   "fieldtype": "Signature",
+   "in_list_view": 1,
+   "label": "\u8d1f\u8d23\u4eba\u7b7e\u540d",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "comment",
+   "fieldtype": "Small Text",
+   "label": "Comment"
+  },
+  {
+   "fieldname": "section_break_gsto",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "attachment",
+   "fieldtype": "Attach",
+   "label": "Attachment",
+   "mandatory_depends_on": "eval:doc.attachment_mandatory==1"
+  },
+  {
+   "fieldname": "custom_sub_flow_name",
+   "fieldtype": "Link",
+   "label": "Sub Flow Name",
+   "options": "Sub Task Flow",
+   "read_only": 1
+  },
+  {
+   "fieldname": "custom_project_name",
+   "fieldtype": "Link",
+   "label": "\u9879\u76ee\u540d\u79f0",
+   "options": "Project",
+   "read_only": 1
+  },
+  {
+   "fieldname": "hidden_backend_uses_only_tab",
+   "fieldtype": "Tab Break",
+   "hidden": 1,
+   "label": "Hidden, Backend Uses Only"
+  },
+  {
+   "fieldname": "section_break_tlvp",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "specifications",
+   "fieldtype": "Small Text",
+   "label": "Specifications",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_rupu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_zeor",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "attachment_mandatory",
+   "fieldtype": "Check",
+   "label": "Attachment Mandatory"
+  }
+ ],
+ "grid_page_length": 50,
+ "in_create": 1,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-14 06:03:14.789970",
+ "modified_by": "dan@gmail.com",
+ "module": "Custom App",
+ "name": "Flow Action",
+ "naming_rule": "Expression",
+ "owner": "357236649@qq.com",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "track_seen": 1
+}

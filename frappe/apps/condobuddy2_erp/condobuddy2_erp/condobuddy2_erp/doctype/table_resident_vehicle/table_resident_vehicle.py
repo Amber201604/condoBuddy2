@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class Resident(Document):
+class TableResidentVehicle(Document):
 	pass
