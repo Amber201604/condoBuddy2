@@ -28,10 +28,26 @@ fixtures = [
 # on_session_creation = "condobuddy2_erp.api.boot.boot_session"
 
 # DocType Events
-# Lifecycle handlers (on_submit/on_cancel/on_update/validate) live directly on
-# the DocType controller classes, so Frappe invokes them automatically. No
-# additional doc_events wiring is needed here.
-doc_events = {}
+doc_events = {
+    "Purchase Order": {
+        "on_submit": [
+            "condobuddy2_erp.condobuddy2_erp.doctype.project.project.update_flow_step_on_document_submit",
+            "condobuddy2_erp.condobuddy2_erp.sub_flow_doc_events.on_submit",
+        ],
+        "on_cancel": [
+            "condobuddy2_erp.condobuddy2_erp.doctype.project.project.update_flow_step_on_document_submit",
+            "condobuddy2_erp.condobuddy2_erp.sub_flow_doc_events.on_cancel",
+        ],
+    },
+    "Purchase Receipt": {
+        "on_submit": "condobuddy2_erp.condobuddy2_erp.doctype.project.project.update_flow_step_on_document_submit",
+        "on_cancel": "condobuddy2_erp.condobuddy2_erp.doctype.project.project.update_flow_step_on_document_submit",
+    },
+    "Stock Entry": {
+        "on_submit": "condobuddy2_erp.condobuddy2_erp.sub_flow_doc_events.on_submit",
+        "on_cancel": "condobuddy2_erp.condobuddy2_erp.sub_flow_doc_events.on_cancel",
+    },
+}
 
 # Scheduled Tasks
 # scheduler_events = {

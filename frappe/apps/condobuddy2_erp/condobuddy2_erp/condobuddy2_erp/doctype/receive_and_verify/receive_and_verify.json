@@ -1,0 +1,350 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-03-11 02:51:54.589938",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "summary_tab",
+  "fulfillment_status",
+  "column_break_vfjl",
+  "future_deliveries",
+  "column_break_rqfx",
+  "estimated_next_arrival",
+  "discrepancy_handling_section",
+  "delivery_problem_found",
+  "resolution_section",
+  "resend_missing_items",
+  "fix_invoice__correct_billing",
+  "column_break_olcj",
+  "return__replace",
+  "write_off_small_amount",
+  "column_break_mtlf",
+  "compensation__discount",
+  "order_vs_received_section",
+  "table_oredered_received",
+  "delivery_details_tab",
+  "purchase_order",
+  "pr_count",
+  "1st_delivery_section",
+  "delivery_date_1",
+  "table_1st_delivery",
+  "inspection_details_1",
+  "2nd_delivery_section",
+  "delivery_date_2",
+  "table_2nd_delivery",
+  "inspection_details_2",
+  "3rd_delivery_section",
+  "delivery_date_3",
+  "table_3rd_delivery",
+  "inspection_details_3",
+  "4th_delivery_section",
+  "delivery_date_4",
+  "table_4th_delivery",
+  "inspection_details_4",
+  "hidden_on_ui_tab",
+  "custom_flow_name",
+  "flow_step",
+  "custom_project_name",
+  "supplier_warehouse",
+  "taxes",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "delivery_date_1",
+   "fieldtype": "Datetime",
+   "label": "Date Arrived",
+   "read_only": 1
+  },
+  {
+   "fieldname": "2nd_delivery_section",
+   "fieldtype": "Section Break",
+   "label": "2nd Delivery"
+  },
+  {
+   "fieldname": "delivery_date_2",
+   "fieldtype": "Datetime",
+   "label": "Date Arrived",
+   "read_only": 1
+  },
+  {
+   "fieldname": "inspection_details_1",
+   "fieldtype": "Small Text",
+   "label": "Damage & Rejection Details",
+   "placeholder": "Please describe any damage or discrepancy found",
+   "read_only": 1
+  },
+  {
+   "fieldname": "inspection_details_2",
+   "fieldtype": "Small Text",
+   "label": "Damage & Rejection Details",
+   "placeholder": "Please describe any damage or discrepancy found",
+   "read_only": 1
+  },
+  {
+   "fieldname": "fulfillment_status",
+   "fieldtype": "Select",
+   "label": "Fulfillment Status ",
+   "options": "Waiting for Delivery\nPartly Received\nDelivery Has Problem\nCompleted, All Received"
+  },
+  {
+   "fieldname": "column_break_vfjl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Yes",
+   "fieldname": "future_deliveries",
+   "fieldtype": "Select",
+   "label": "Future Deliveries",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "column_break_rqfx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "estimated_next_arrival",
+   "fieldtype": "Date",
+   "label": "Estimated Next Arrival"
+  },
+  {
+   "fieldname": "discrepancy_handling_section",
+   "fieldtype": "Section Break",
+   "label": "Delivery Problem",
+   "read_only": 1
+  },
+  {
+   "fieldname": "table_1st_delivery",
+   "fieldtype": "Table",
+   "options": "Table Delivery History",
+   "read_only": 1
+  },
+  {
+   "fieldname": "3rd_delivery_section",
+   "fieldtype": "Section Break",
+   "label": "3rd Delivery"
+  },
+  {
+   "fieldname": "delivery_date_3",
+   "fieldtype": "Datetime",
+   "label": "Date Arrived",
+   "read_only": 1
+  },
+  {
+   "fieldname": "inspection_details_3",
+   "fieldtype": "Small Text",
+   "label": "Damage & Rejection Details",
+   "read_only": 1
+  },
+  {
+   "fieldname": "4th_delivery_section",
+   "fieldtype": "Section Break",
+   "label": "4th Delivery"
+  },
+  {
+   "fieldname": "delivery_date_4",
+   "fieldtype": "Datetime",
+   "label": "Date Arrived",
+   "read_only": 1
+  },
+  {
+   "fieldname": "inspection_details_4",
+   "fieldtype": "Small Text",
+   "label": "Damage & Rejection Details",
+   "read_only": 1
+  },
+  {
+   "default": "No",
+   "fieldname": "delivery_problem_found",
+   "fieldtype": "Select",
+   "label": "Delivery Problem Found",
+   "options": "Yes\nNo",
+   "read_only": 1
+  },
+  {
+   "fieldname": "summary_tab",
+   "fieldtype": "Tab Break",
+   "label": "Summary"
+  },
+  {
+   "fieldname": "delivery_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Delivery Details"
+  },
+  {
+   "fieldname": "table_oredered_received",
+   "fieldtype": "Table",
+   "options": "Table Ordered vs Received",
+   "read_only": 1
+  },
+  {
+   "fieldname": "order_vs_received_section",
+   "fieldtype": "Section Break",
+   "label": "Ordered vs. Received"
+  },
+  {
+   "fieldname": "table_2nd_delivery",
+   "fieldtype": "Table",
+   "options": "Table Delivery History",
+   "read_only": 1
+  },
+  {
+   "fieldname": "table_3rd_delivery",
+   "fieldtype": "Table",
+   "options": "Table Delivery History",
+   "read_only": 1
+  },
+  {
+   "fieldname": "table_4th_delivery",
+   "fieldtype": "Table",
+   "options": "Table Delivery History",
+   "read_only": 1
+  },
+  {
+   "fieldname": "hidden_on_ui_tab",
+   "fieldtype": "Tab Break",
+   "hidden": 1,
+   "label": "Hidden on UI"
+  },
+  {
+   "fieldname": "custom_flow_name",
+   "fieldtype": "Link",
+   "label": "custom_flow_name",
+   "options": "Task Flow"
+  },
+  {
+   "fieldname": "flow_step",
+   "fieldtype": "Int",
+   "label": "flow_step"
+  },
+  {
+   "fieldname": "custom_project_name",
+   "fieldtype": "Link",
+   "label": "custom_project_name",
+   "options": "Project"
+  },
+  {
+   "fieldname": "supplier_warehouse",
+   "fieldtype": "Link",
+   "label": "Supplier Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "taxes",
+   "fieldtype": "Table",
+   "label": "Purchase Taxes and Charges",
+   "options": "Purchase Taxes and Charges"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Receive and Verify",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "purchase_order",
+   "fieldtype": "Link",
+   "label": "Purchase Order",
+   "options": "Purchase Order"
+  },
+  {
+   "default": "0",
+   "fieldname": "pr_count",
+   "fieldtype": "Int",
+   "label": "PR Count",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.delivery_problem_found == 'Yes'",
+   "fieldname": "resolution_section",
+   "fieldtype": "Section Break",
+   "label": "Resolution",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "resend_missing_items",
+   "fieldtype": "Check",
+   "label": "Resend missing items",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "fix_invoice__correct_billing",
+   "fieldtype": "Check",
+   "label": "Fix Invoice / Correct Billing",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_olcj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "return__replace",
+   "fieldtype": "Check",
+   "label": "Return / Replace",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "write_off_small_amount",
+   "fieldtype": "Check",
+   "label": "Write off (Small Amount)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_mtlf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "compensation__discount",
+   "fieldtype": "Check",
+   "label": "Compensation / Discount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "1st_delivery_section",
+   "fieldtype": "Section Break",
+   "label": "1st Delivery",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-05-29 04:53:30.980335",
+ "modified_by": "dan@gmail.com",
+ "module": "Buying",
+ "name": "Receive and Verify",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

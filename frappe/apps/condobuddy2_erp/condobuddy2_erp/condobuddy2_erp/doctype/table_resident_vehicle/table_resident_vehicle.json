@@ -1,0 +1,47 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-06-17 04:41:30.478694",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "vehicle_plate",
+  "assigned_parking_stall",
+  "parking_zone"
+ ],
+ "fields": [
+  {
+   "fieldname": "vehicle_plate",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Vehicle Plate"
+  },
+  {
+   "fieldname": "assigned_parking_stall",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Assigned Parking Stall"
+  },
+  {
+   "fieldname": "parking_zone",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Parking Zone"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-06-17 04:42:44.418667",
+ "modified_by": "Administrator",
+ "module": "Custom App",
+ "name": "Table Resident Vehicle",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

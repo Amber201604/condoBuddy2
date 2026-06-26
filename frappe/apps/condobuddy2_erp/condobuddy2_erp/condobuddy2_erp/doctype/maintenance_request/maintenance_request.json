@@ -1,0 +1,162 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format: 3882HW7-U1204-{###}",
+ "creation": "2026-06-17 03:55:18.772760",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "category_section",
+  "resident",
+  "category",
+  "column_break_dekw",
+  "unit",
+  "urgency",
+  "column_break_pufw",
+  "building",
+  "date_submitted",
+  "section_break_kjry",
+  "description",
+  "photo",
+  "section_break_chmf",
+  "status",
+  "column_break_tlse",
+  "assigned_to",
+  "column_break_siku",
+  "reference_number",
+  "section_break_iqrd",
+  "management_notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_chmf",
+   "fieldtype": "Section Break",
+   "label": "Status tracking"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Category"
+  },
+  {
+   "fieldname": "category_section",
+   "fieldtype": "Section Break",
+   "label": "Resident Identity"
+  },
+  {
+   "fieldname": "urgency",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Urgency",
+   "options": "Routine\nMedium\nUrgent"
+  },
+  {
+   "fieldname": "resident",
+   "fieldtype": "Link",
+   "label": "Resident",
+   "options": "Resident"
+  },
+  {
+   "fieldname": "unit",
+   "fieldtype": "Data",
+   "label": "Unit"
+  },
+  {
+   "fieldname": "building",
+   "fieldtype": "Data",
+   "label": "Building"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Open\nIn Progress\nScheduled\nCompleted\nClosed"
+  },
+  {
+   "fieldname": "assigned_to",
+   "fieldtype": "Link",
+   "label": "Assigned To",
+   "options": "User"
+  },
+  {
+   "fieldname": "management_notes",
+   "fieldtype": "Small Text",
+   "label": "Management Notes",
+   "options": "Received\nIn Progress\nScheduled\nCompleted"
+  },
+  {
+   "fieldname": "reference_number",
+   "fieldtype": "Data",
+   "label": "Reference Number"
+  },
+  {
+   "fieldname": "photo",
+   "fieldtype": "Attach Image",
+   "label": "Photo"
+  },
+  {
+   "fieldname": "column_break_tlse",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_siku",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_iqrd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_kjry",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_dekw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_pufw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "date_submitted",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Date Submitted"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-06-25 00:57:31.997377",
+ "modified_by": "Administrator",
+ "module": "Custom App",
+ "name": "Maintenance Request",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

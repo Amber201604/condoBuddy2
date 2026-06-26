@@ -1,0 +1,165 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:{amenity}-{booking_date}-{start_time}-Unit{unit}",
+ "creation": "2026-06-23 01:45:48.902125",
+ "default_view": "List",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_ghh9",
+  "amenity",
+  "building",
+  "column_break_sswh",
+  "unit",
+  "booking_status",
+  "column_break_mnjw",
+  "resident",
+  "section_break_nhpe",
+  "slot_picker",
+  "section_break_sges",
+  "booking_date",
+  "column_break_wcpz",
+  "start_time",
+  "column_break_jkka",
+  "end_time",
+  "section_break_cvcy",
+  "qr_code",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_ghh9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amenity",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Amenity",
+   "options": "Party Room\nRooftop Terrace"
+  },
+  {
+   "default": "1204",
+   "fieldname": "unit",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Unit"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Start Time"
+  },
+  {
+   "fieldname": "column_break_sswh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "resident",
+   "fieldtype": "Link",
+   "label": "Resident",
+   "options": "Resident"
+  },
+  {
+   "default": "3882_HW7",
+   "fieldname": "building",
+   "fieldtype": "Data",
+   "label": "Building"
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Data",
+   "label": "End Time"
+  },
+  {
+   "fieldname": "section_break_nhpe",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "slot_picker",
+   "fieldtype": "HTML",
+   "label": "Slot Picker"
+  },
+  {
+   "fieldname": "section_break_sges",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "booking_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Booking Date"
+  },
+  {
+   "fieldname": "column_break_wcpz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "booking_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Booking Status",
+   "options": "Pending\nConfirmed\nCancelled\nCompleted"
+  },
+  {
+   "fieldname": "section_break_cvcy",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval: doc.booking_status == \"Confirmed\"\r\n",
+   "fieldname": "qr_code",
+   "fieldtype": "HTML",
+   "label": "QR Code"
+  },
+  {
+   "fieldname": "column_break_mnjw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Amenity Booking",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_jkka",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-06-23 08:15:10.214348",
+ "modified_by": "Administrator",
+ "module": "Custom App",
+ "name": "Amenity Booking",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
