@@ -1,4 +1,5 @@
 """Visitors router."""
+import logging
 from typing import List
 from uuid import UUID
 import secrets
@@ -14,6 +15,8 @@ from app.core.websocket import manager
 from app.models import User
 from app.models import Visitor
 from app.schemas import VisitorCreate, VisitorRead
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/visitors", tags=["Visitors"])
 
@@ -87,10 +90,13 @@ async def visitor_check_in(
         raise HTTPException(status_code=404, detail="Visitor not found")
     v.status = "checked_in"
     await db.commit()
-    await manager.send_to_user(
-        str(v.resident_id),
-        {"type": "visitor_checked_in", "data": {"visitor_name": v.visitor_name}},
-    )
+    try:
+        await manager.send_to_user(
+            str(v.resident_id),
+            {"type": "visitor_checked_in", "data": {"visitor_name": v.visitor_name}},
+        )
+    except Exception as exc:
+        logger.error("Failed to notify resident %s of visitor check-in: %s", v.resident_id, exc)
     return {"message": "Visitor checked in"}
 
 

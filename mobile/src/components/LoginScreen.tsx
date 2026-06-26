@@ -30,7 +30,12 @@ export default function LoginScreen() {
       const res = await login(email, password);
       setAuth(res.data.access_token, res.data.user);
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Login failed");
+      const detail = err?.response?.data?.detail;
+      const message = typeof detail === "string"
+        ? detail
+        : err?.message || "Login failed. Please check your connection and try again.";
+      setError(message);
+      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,5 @@
 """LPR (License Plate Recognition) Parking router."""
+import logging
 from typing import List
 from uuid import UUID
 
@@ -12,6 +13,8 @@ from app.core.websocket import manager
 from app.models import User
 from app.models import LPREvent
 from app.schemas import LPREventCreate, LPREventRead
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/lpr", tags=["LPR Parking"])
 
@@ -62,18 +65,20 @@ async def create_lpr_event(
     await db.commit()
     await db.refresh(event)
 
-    # Broadcast to staff
-    await manager.broadcast(
-        {
-            "type": "lpr_event",
-            "data": {
-                "plate_number": event.plate_number,
-                "direction": event.direction,
-                "is_visitor": event.is_visitor,
+    try:
+        await manager.broadcast(
+            {
+                "type": "lpr_event",
+                "data": {
+                    "plate_number": event.plate_number,
+                    "direction": event.direction,
+                    "is_visitor": event.is_visitor,
+                },
             },
-        },
-        room="staff",
-    )
+            room="staff",
+        )
+    except Exception as exc:
+        logger.error("Failed to broadcast LPR event for plate %s: %s", event.plate_number, exc)
     return event
 
 
@@ -103,15 +108,18 @@ async def mark_stolen(
     event.is_stolen_alert = True
     await db.commit()
 
-    await manager.broadcast(
-        {
-            "type": "stolen_vehicle_alert",
-            "data": {
-                "plate_number": event.plate_number,
-                "direction": event.direction,
-                "timestamp": event.timestamp.isoformat(),
+    try:
+        await manager.broadcast(
+            {
+                "type": "stolen_vehicle_alert",
+                "data": {
+                    "plate_number": event.plate_number,
+                    "direction": event.direction,
+                    "timestamp": event.timestamp.isoformat(),
+                },
             },
-        },
-        room="staff",
-    )
+            room="staff",
+        )
+    except Exception as exc:
+        logger.error("Failed to broadcast stolen vehicle alert for plate %s: %s", event.plate_number, exc)
     return {"message": "Marked as stolen vehicle alert"}

@@ -1,4 +1,5 @@
 """Work Orders router."""
+import logging
 from typing import List
 from uuid import UUID
 
@@ -12,6 +13,8 @@ from app.core.websocket import manager
 from app.models import User
 from app.models import WorkOrder
 from app.schemas import WorkOrderCreate, WorkOrderRead, WorkOrderUpdate
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/work-orders", tags=["Work Orders"])
 
@@ -57,11 +60,13 @@ async def create_work_order(
     await db.commit()
     await db.refresh(wo)
 
-    # Notify staff via WebSocket
-    await manager.broadcast(
-        {"type": "new_work_order", "data": {"id": str(wo.id), "title": wo.title}},
-        room="staff",
-    )
+    try:
+        await manager.broadcast(
+            {"type": "new_work_order", "data": {"id": str(wo.id), "title": wo.title}},
+            room="staff",
+        )
+    except Exception as exc:
+        logger.error("Failed to broadcast new work order %s: %s", wo.id, exc)
     return wo
 
 
@@ -102,10 +107,13 @@ async def update_work_order(
     await db.commit()
     await db.refresh(wo)
 
-    await manager.send_to_user(
-        str(wo.resident_id),
-        {"type": "work_order_updated", "data": {"id": str(wo.id), "status": wo.status}},
-    )
+    try:
+        await manager.send_to_user(
+            str(wo.resident_id),
+            {"type": "work_order_updated", "data": {"id": str(wo.id), "status": wo.status}},
+        )
+    except Exception as exc:
+        logger.error("Failed to notify resident %s of work order update: %s", wo.resident_id, exc)
     return wo
 
 

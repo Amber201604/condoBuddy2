@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   RefreshControl,
+  Alert,
 } from "react-native";
 import { useAuthStore } from "../store/auth";
 import { listWorkOrders, listPackages, listVisitors } from "../api/client";
@@ -18,8 +19,11 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [notifications, setNotifications] = useState<string[]>([]);
 
+  const [loadError, setLoadError] = useState<string | null>(null);
+
   const loadStats = async () => {
     try {
+      setLoadError(null);
       const [woRes, pkgRes, visRes] = await Promise.all([
         listWorkOrders({ status: "open" }),
         listPackages({ status: "notified" }),
@@ -30,8 +34,10 @@ export default function HomeScreen() {
         pkg: pkgRes.data.length,
         visitors: visRes.data.length,
       });
-    } catch (e) {
-      // silent fail
+    } catch (e: any) {
+      const message = e?.response?.data?.detail || e?.message || "Failed to load dashboard data";
+      setLoadError(message);
+      console.error("HomeScreen loadStats error:", e);
     }
   };
 
@@ -59,6 +65,12 @@ export default function HomeScreen() {
         <Text style={styles.greeting}>Hey, {user?.full_name || "Resident"} 🖤</Text>
         <Text style={styles.unit}>Unit {user?.unit_number || "—"}</Text>
       </View>
+
+      {loadError && (
+        <View style={styles.errorBanner}>
+          <Text style={styles.errorText}>{loadError}</Text>
+        </View>
+      )}
 
       <View style={styles.statsRow}>
         <StatCard label="Open Work Orders" value={stats.wo} icon="🔧" />
@@ -138,4 +150,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   actionText: { color: "#fff", fontSize: 15 },
+  errorBanner: {
+    margin: 16,
+    backgroundColor: "#3d1a1a",
+    borderRadius: 8,
+    padding: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: "#e94560",
+  },
+  errorText: { color: "#ff6b6b", fontSize: 13 },
 });

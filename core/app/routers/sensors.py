@@ -1,4 +1,5 @@
 """Sensors router — IoT sensor alerts (smoke, motion, water leak, etc.)."""
+import logging
 from typing import List
 from uuid import UUID
 
@@ -12,6 +13,8 @@ from app.core.websocket import manager
 from app.models import User
 from app.models import Sensor, SensorAlert
 from app.schemas import SensorCreate, SensorRead, SensorAlertBase, SensorAlertRead, AlertAcknowledge
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/sensors", tags=["Sensors"])
 
@@ -116,21 +119,26 @@ async def sensor_reading(
 
     if alert:
         db.add(alert)
-        await manager.broadcast(
-            {
-                "type": "sensor_alert",
-                "data": {
-                    "sensor_id": str(sensor.id),
-                    "alert_type": alert.alert_type,
-                    "severity": alert.severity,
-                    "message": alert.message,
-                    "location": sensor.location,
-                },
-            },
-            room="staff",
-        )
 
     await db.commit()
+
+    if alert:
+        try:
+            await manager.broadcast(
+                {
+                    "type": "sensor_alert",
+                    "data": {
+                        "sensor_id": str(sensor.id),
+                        "alert_type": alert.alert_type,
+                        "severity": alert.severity,
+                        "message": alert.message,
+                        "location": sensor.location,
+                    },
+                },
+                room="staff",
+            )
+        except Exception as exc:
+            logger.error("Failed to broadcast sensor alert for sensor %s: %s", sensor_id, exc)
     if alert:
         await db.refresh(alert)
         return {"status": "alert_triggered", "alert_id": str(alert.id)}
