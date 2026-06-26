@@ -63,6 +63,7 @@ class TestIntegration(FrappeTestCase):
             get_resident_portal_data,
             get_facility_availability,
             create_visitor,
+            create_booking,
             get_cctv_feeds,
             receive_iot_alert,
             receive_access_log
@@ -70,6 +71,7 @@ class TestIntegration(FrappeTestCase):
         self.assertTrue(callable(get_resident_portal_data))
         self.assertTrue(callable(get_facility_availability))
         self.assertTrue(callable(create_visitor))
+        self.assertTrue(callable(create_booking))
         self.assertTrue(callable(get_cctv_feeds))
         self.assertTrue(callable(receive_iot_alert))
         self.assertTrue(callable(receive_access_log))

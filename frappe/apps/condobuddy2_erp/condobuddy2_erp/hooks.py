@@ -6,15 +6,23 @@ app_email = "admin@condobuddy.ca"
 app_license = "mit"
 app_version = "1.0.0"
 
-# Web pages
-app_include_js = "/assets/condobuddy2_erp/js/condobuddy2.js"
-app_include_css = "/assets/condobuddy2_erp/css/condobuddy2.css"
+# Resident portal assets.
+# The resident portal page (`www/resident-portal.html`) links these directly,
+# so they are intentionally NOT added to `app_include_*` (which would load them
+# into the Frappe Desk admin UI and is unnecessary).
 
 # Website
 website_context = {
-    "favicon": "/assets/condobuddy2_erp/images/favicon.png",
-    "splash_image": "/assets/condobuddy2_erp/images/logo.png",
+	"favicon": "/assets/condobuddy2_erp/images/favicon.png",
+	"splash_image": "/assets/condobuddy2_erp/images/logo.png",
 }
+
+# Fixtures
+# Ship the management Desk homepage (Workspace) so the most-used functions are
+# listed front and center. Synced on `install-app` and `bench migrate`.
+fixtures = [
+	{"dt": "Workspace", "filters": [["module", "=", "CondoBuddy2 ERP"]]},
+]
 
 # Boot session
 # on_session_creation = "condobuddy2_erp.api.boot.boot_session"

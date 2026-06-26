@@ -1,0 +1,221 @@
+[
+ {
+  "charts": [],
+  "content": "[{\"id\":\"cb_title\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>CondoBuddy2 \u2014 Management Console</b></span>\",\"col\":12}},{\"id\":\"cb_intro\",\"type\":\"paragraph\",\"data\":{\"text\":\"Day-to-day operations for your community: visitors &amp; access, packages, facility bookings, residents and security monitoring.\",\"col\":12}},{\"id\":\"cb_qa\",\"type\":\"header\",\"data\":{\"text\":\"<b>Quick Actions</b>\",\"col\":12}},{\"id\":\"cb_s1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Visitors\",\"col\":3}},{\"id\":\"cb_s2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Packages\",\"col\":3}},{\"id\":\"cb_s3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Facility Bookings\",\"col\":3}},{\"id\":\"cb_s4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Security Alerts\",\"col\":3}},{\"id\":\"cb_s5\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Access Log\",\"col\":3}},{\"id\":\"cb_s6\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Residents\",\"col\":3}},{\"id\":\"cb_cat\",\"type\":\"header\",\"data\":{\"text\":\"<b>Browse by Category</b>\",\"col\":12}},{\"id\":\"cb_c1\",\"type\":\"card\",\"data\":{\"card_name\":\"Visitor & Access\",\"col\":4}},{\"id\":\"cb_c2\",\"type\":\"card\",\"data\":{\"card_name\":\"Facilities\",\"col\":4}},{\"id\":\"cb_c3\",\"type\":\"card\",\"data\":{\"card_name\":\"Packages\",\"col\":4}},{\"id\":\"cb_c4\",\"type\":\"card\",\"data\":{\"card_name\":\"Residents & Units\",\"col\":4}},{\"id\":\"cb_c5\",\"type\":\"card\",\"data\":{\"card_name\":\"Security & Monitoring\",\"col\":4}}]",
+  "docstatus": 0,
+  "doctype": "Workspace",
+  "for_user": "",
+  "hide_custom": 0,
+  "icon": "organization",
+  "idx": 0,
+  "indicator_color": "",
+  "is_hidden": 0,
+  "label": "CondoBuddy2",
+  "links": [
+   {
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "Visitor & Access",
+    "link_count": 2,
+    "onboard": 0,
+    "type": "Card Break"
+   },
+   {
+    "dependencies": "",
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "Visitor",
+    "link_count": 0,
+    "link_to": "Visitor",
+    "link_type": "DocType",
+    "onboard": 1,
+    "type": "Link"
+   },
+   {
+    "dependencies": "",
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "Access Log",
+    "link_count": 0,
+    "link_to": "Access Log",
+    "link_type": "DocType",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "Facilities",
+    "link_count": 2,
+    "onboard": 0,
+    "type": "Card Break"
+   },
+   {
+    "dependencies": "",
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "Facility Booking",
+    "link_count": 0,
+    "link_to": "Facility Booking",
+    "link_type": "DocType",
+    "onboard": 1,
+    "type": "Link"
+   },
+   {
+    "dependencies": "",
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "Facility",
+    "link_count": 0,
+    "link_to": "Facility",
+    "link_type": "DocType",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "Packages",
+    "link_count": 1,
+    "onboard": 0,
+    "type": "Card Break"
+   },
+   {
+    "dependencies": "",
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "Package",
+    "link_count": 0,
+    "link_to": "Package",
+    "link_type": "DocType",
+    "onboard": 1,
+    "type": "Link"
+   },
+   {
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "Residents & Units",
+    "link_count": 3,
+    "onboard": 0,
+    "type": "Card Break"
+   },
+   {
+    "dependencies": "",
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "Resident",
+    "link_count": 0,
+    "link_to": "Resident",
+    "link_type": "DocType",
+    "onboard": 1,
+    "type": "Link"
+   },
+   {
+    "dependencies": "",
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "Unit",
+    "link_count": 0,
+    "link_to": "Unit",
+    "link_type": "DocType",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
+    "dependencies": "",
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "Unit Resident",
+    "link_count": 0,
+    "link_to": "Unit Resident",
+    "link_type": "DocType",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "Security & Monitoring",
+    "link_count": 2,
+    "onboard": 0,
+    "type": "Card Break"
+   },
+   {
+    "dependencies": "",
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "CCTV Alert",
+    "link_count": 0,
+    "link_to": "CCTV Alert",
+    "link_type": "DocType",
+    "onboard": 0,
+    "type": "Link"
+   },
+   {
+    "dependencies": "",
+    "hidden": 0,
+    "is_query_report": 0,
+    "label": "IoT Sensor",
+    "link_count": 0,
+    "link_to": "IoT Sensor",
+    "link_type": "DocType",
+    "onboard": 0,
+    "type": "Link"
+   }
+  ],
+  "module": "CondoBuddy2 ERP",
+  "name": "CondoBuddy2",
+  "number_cards": [],
+  "owner": "Administrator",
+  "parent_page": "",
+  "public": 1,
+  "quick_lists": [],
+  "roles": [],
+  "sequence_id": 1.0,
+  "shortcuts": [
+   {
+    "color": "Blue",
+    "doc_view": "List",
+    "label": "Visitors",
+    "link_to": "Visitor",
+    "type": "DocType"
+   },
+   {
+    "color": "Orange",
+    "doc_view": "List",
+    "label": "Packages",
+    "link_to": "Package",
+    "type": "DocType"
+   },
+   {
+    "color": "Green",
+    "doc_view": "List",
+    "label": "Facility Bookings",
+    "link_to": "Facility Booking",
+    "type": "DocType"
+   },
+   {
+    "color": "Red",
+    "doc_view": "List",
+    "label": "Security Alerts",
+    "link_to": "CCTV Alert",
+    "type": "DocType"
+   },
+   {
+    "color": "Grey",
+    "doc_view": "List",
+    "label": "Access Log",
+    "link_to": "Access Log",
+    "type": "DocType"
+   },
+   {
+    "color": "Purple",
+    "doc_view": "List",
+    "label": "Residents",
+    "link_to": "Resident",
+    "type": "DocType"
+   }
+  ],
+  "title": "CondoBuddy2"
+ }
+]

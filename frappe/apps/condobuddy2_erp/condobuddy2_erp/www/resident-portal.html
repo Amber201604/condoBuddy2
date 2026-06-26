@@ -2,123 +2,238 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>CondoBuddy2 — Resident Portal</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+	<meta name="theme-color" content="#4f46e5">
+	<title>CondoBuddy — Resident Portal</title>
 	<link rel="stylesheet" href="/assets/condobuddy2_erp/css/condobuddy2.css">
 </head>
 <body>
 	<div class="cb-portal">
-		<header class="cb-header">
-			<h1>CondoBuddy2</h1>
-			<p class="cb-subtitle">Resident Portal</p>
+		<!-- Top app bar -->
+		<header class="cb-appbar">
+			<div class="cb-brand">
+				<span class="cb-logo">CB</span>
+				<div class="cb-brand-text">
+					<strong>CondoBuddy</strong>
+					<small>Resident Portal</small>
+				</div>
+			</div>
+			<div class="cb-user" id="cb-user">
+				<div class="cb-avatar" id="cb-avatar">R</div>
+				<div class="cb-user-meta">
+					<span class="cb-user-name" id="cb-user-name">Resident</span>
+					<span class="cb-user-unit" id="cb-user-unit">—</span>
+				</div>
+			</div>
 		</header>
-		
-		<nav class="cb-nav">
-			<a href="#dashboard" class="cb-nav-item active">Dashboard</a>
-			<a href="#bookings" class="cb-nav-item">Bookings</a>
-			<a href="#visitors" class="cb-nav-item">Visitors</a>
-			<a href="#packages" class="cb-nav-item">Packages</a>
-			<a href="#access" class="cb-nav-item">Access</a>
-			<a href="#cctv" class="cb-nav-item">CCTV</a>
-		</nav>
-		
+
 		<main class="cb-main">
-			<section id="dashboard" class="cb-section active">
-				<h2>Dashboard</h2>
-				<div class="cb-cards">
-					<div class="cb-card">
-						<h3>Upcoming Bookings</h3>
-						<div id="bookings-list" class="cb-list">Loading...</div>
+			<!-- HOME -->
+			<section id="home" class="cb-view is-active">
+				<div class="cb-hero">
+					<h2 id="cb-greeting">Welcome back</h2>
+					<p>Here's what's happening at your unit today.</p>
+				</div>
+
+				<div class="cb-quick">
+					<button class="cb-quick-btn" data-go="visitors">
+						<span class="cb-quick-icon">👤</span>
+						<span>Register Visitor</span>
+					</button>
+					<button class="cb-quick-btn" data-go="bookings">
+						<span class="cb-quick-icon">📅</span>
+						<span>Book Facility</span>
+					</button>
+				</div>
+
+				<div class="cb-stats">
+					<div class="cb-stat" data-go="visitors">
+						<span class="cb-stat-num" id="stat-visitors">0</span>
+						<span class="cb-stat-label">Expected Visitors</span>
 					</div>
-					<div class="cb-card">
-						<h3>Expected Visitors</h3>
-						<div id="visitors-list" class="cb-list">Loading...</div>
+					<div class="cb-stat" data-go="packages">
+						<span class="cb-stat-num" id="stat-packages">0</span>
+						<span class="cb-stat-label">Packages to Collect</span>
 					</div>
-					<div class="cb-card">
-						<h3>Packages</h3>
-						<div id="packages-list" class="cb-list">Loading...</div>
+					<div class="cb-stat" data-go="bookings">
+						<span class="cb-stat-num" id="stat-bookings">0</span>
+						<span class="cb-stat-label">Upcoming Bookings</span>
 					</div>
-					<div class="cb-card">
-						<h3>Recent Alerts</h3>
-						<div id="alerts-list" class="cb-list">Loading...</div>
+				</div>
+
+				<div class="cb-panel">
+					<div class="cb-panel-head">
+						<h3>Recent Activity</h3>
+						<button class="cb-link-btn" data-go="access">View all</button>
+					</div>
+					<div id="home-activity" class="cb-list">
+						<div class="cb-skeleton"></div>
+						<div class="cb-skeleton"></div>
+						<div class="cb-skeleton"></div>
 					</div>
 				</div>
 			</section>
-			
-			<section id="bookings" class="cb-section">
-				<h2>Facility Booking</h2>
-				<form id="booking-form" class="cb-form">
-					<label>
-						Facility
-						<select id="booking-facility" required></select>
-					</label>
-					<label>
-						Date
-						<input type="date" id="booking-date" required>
-					</label>
-					<label>
-						Start Time
-						<input type="time" id="booking-start" required>
-					</label>
-					<label>
-						End Time
-						<input type="time" id="booking-end" required>
-					</label>
-					<label>
-						Purpose
-						<input type="text" id="booking-purpose" placeholder="Purpose of booking">
-					</label>
-					<button type="submit" class="cb-btn cb-btn-primary">Book Now</button>
-				</form>
-				<div id="booking-history" class="cb-list"></div>
+
+			<!-- VISITORS -->
+			<section id="visitors" class="cb-view">
+				<div class="cb-view-head">
+					<h2>Visitors</h2>
+					<p>Pre-register guests and share their access pass.</p>
+				</div>
+
+				<div class="cb-panel">
+					<div class="cb-panel-head">
+						<h3>Pre-register a Visitor</h3>
+					</div>
+					<form id="visitor-form" class="cb-form">
+						<div class="cb-field">
+							<label for="visitor-name">Visitor name *</label>
+							<input type="text" id="visitor-name" placeholder="e.g. Alex Chen" required>
+						</div>
+						<div class="cb-row">
+							<div class="cb-field">
+								<label for="visitor-phone">Phone</label>
+								<input type="tel" id="visitor-phone" placeholder="Optional">
+							</div>
+							<div class="cb-field">
+								<label for="visitor-type">Visit type</label>
+								<select id="visitor-type">
+									<option value="Guest">Guest</option>
+									<option value="Delivery">Delivery</option>
+									<option value="Service">Service</option>
+									<option value="Contractor">Contractor</option>
+								</select>
+							</div>
+						</div>
+						<div class="cb-field">
+							<label for="visitor-arrival">Expected arrival</label>
+							<input type="datetime-local" id="visitor-arrival">
+						</div>
+						<button type="submit" class="cb-btn cb-btn-primary">Generate Access Pass</button>
+					</form>
+				</div>
+
+				<div class="cb-panel">
+					<div class="cb-panel-head">
+						<h3>My Visitors</h3>
+					</div>
+					<div id="visitor-history" class="cb-list">
+						<div class="cb-skeleton"></div>
+						<div class="cb-skeleton"></div>
+					</div>
+				</div>
 			</section>
-			
-			<section id="visitors" class="cb-section">
-				<h2>Pre-register Visitor</h2>
-				<form id="visitor-form" class="cb-form">
-					<label>
-						Visitor Name
-						<input type="text" id="visitor-name" required>
-					</label>
-					<label>
-						Phone
-						<input type="tel" id="visitor-phone">
-					</label>
-					<label>
-						Visit Type
-						<select id="visitor-type">
-							<option value="Guest">Guest</option>
-							<option value="Delivery">Delivery</option>
-							<option value="Service">Service</option>
-							<option value="Contractor">Contractor</option>
-						</select>
-					</label>
-					<label>
-						Expected Arrival
-						<input type="datetime-local" id="visitor-arrival">
-					</label>
-					<button type="submit" class="cb-btn cb-btn-primary">Register</button>
-				</form>
-				<div id="visitor-history" class="cb-list"></div>
+
+			<!-- PACKAGES -->
+			<section id="packages" class="cb-view">
+				<div class="cb-view-head">
+					<h2>Packages</h2>
+					<p>Parcels held at the package room for your unit.</p>
+				</div>
+				<div class="cb-panel">
+					<div id="packages-all" class="cb-list">
+						<div class="cb-skeleton"></div>
+						<div class="cb-skeleton"></div>
+					</div>
+				</div>
 			</section>
-			
-			<section id="packages" class="cb-section">
-				<h2>My Packages</h2>
-				<div id="packages-all" class="cb-list">Loading...</div>
+
+			<!-- BOOKINGS -->
+			<section id="bookings" class="cb-view">
+				<div class="cb-view-head">
+					<h2>Facility Booking</h2>
+					<p>Reserve shared amenities in your building.</p>
+				</div>
+
+				<div class="cb-panel">
+					<div class="cb-panel-head">
+						<h3>New Booking</h3>
+					</div>
+					<form id="booking-form" class="cb-form">
+						<div class="cb-field">
+							<label for="booking-facility">Facility *</label>
+							<select id="booking-facility" required></select>
+						</div>
+						<div class="cb-field">
+							<label for="booking-date">Date *</label>
+							<input type="date" id="booking-date" required>
+						</div>
+						<div class="cb-row">
+							<div class="cb-field">
+								<label for="booking-start">Start *</label>
+								<input type="time" id="booking-start" required>
+							</div>
+							<div class="cb-field">
+								<label for="booking-end">End *</label>
+								<input type="time" id="booking-end" required>
+							</div>
+						</div>
+						<div class="cb-field">
+							<label for="booking-purpose">Purpose</label>
+							<input type="text" id="booking-purpose" placeholder="Optional">
+						</div>
+						<button type="submit" class="cb-btn cb-btn-primary">Request Booking</button>
+					</form>
+				</div>
+
+				<div class="cb-panel">
+					<div class="cb-panel-head">
+						<h3>My Bookings</h3>
+					</div>
+					<div id="booking-history" class="cb-list">
+						<div class="cb-skeleton"></div>
+						<div class="cb-skeleton"></div>
+					</div>
+				</div>
 			</section>
-			
-			<section id="access" class="cb-section">
-				<h2>Access History</h2>
-				<div id="access-history" class="cb-list">Loading...</div>
-			</section>
-			
-			<section id="cctv" class="cb-section">
-				<h2>CCTV Feeds</h2>
-				<div id="cctv-feeds" class="cb-grid">Loading...</div>
+
+			<!-- ACCESS -->
+			<section id="access" class="cb-view">
+				<div class="cb-view-head">
+					<h2>Access History</h2>
+					<p>Entry and exit events linked to your unit.</p>
+				</div>
+				<div class="cb-panel">
+					<div id="access-history" class="cb-list">
+						<div class="cb-skeleton"></div>
+						<div class="cb-skeleton"></div>
+					</div>
+				</div>
 			</section>
 		</main>
+
+		<!-- Bottom navigation -->
+		<nav class="cb-tabbar">
+			<button class="cb-tab is-active" data-go="home">
+				<span class="cb-tab-icon">🏠</span><span>Home</span>
+			</button>
+			<button class="cb-tab" data-go="visitors">
+				<span class="cb-tab-icon">👤</span><span>Visitors</span>
+			</button>
+			<button class="cb-tab" data-go="packages">
+				<span class="cb-tab-icon">📦</span><span>Packages</span>
+			</button>
+			<button class="cb-tab" data-go="bookings">
+				<span class="cb-tab-icon">📅</span><span>Book</span>
+			</button>
+			<button class="cb-tab" data-go="access">
+				<span class="cb-tab-icon">🔑</span><span>Access</span>
+			</button>
+		</nav>
 	</div>
-	
+
+	<!-- Pass / QR modal -->
+	<div class="cb-modal" id="cb-modal" hidden>
+		<div class="cb-modal-card">
+			<button class="cb-modal-close" id="cb-modal-close" aria-label="Close">&times;</button>
+			<div id="cb-modal-body"></div>
+		</div>
+	</div>
+
+	<!-- Toast container -->
+	<div class="cb-toasts" id="cb-toasts"></div>
+
+	<script>window.csrf_token = '{{ csrf_token }}';</script>
 	<script src="/assets/condobuddy2_erp/js/condobuddy2.js"></script>
 </body>
 </html>

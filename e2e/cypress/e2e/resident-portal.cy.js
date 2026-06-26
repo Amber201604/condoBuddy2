@@ -2,52 +2,48 @@
 
 describe('Resident Portal', () => {
   beforeEach(() => {
-    // Clear cookies and localStorage before each test
     cy.clearCookies();
     cy.clearLocalStorage();
   });
 
   it('loads the resident portal page', () => {
     cy.visit('/resident-portal.html');
-    cy.get('.cb-header h1').should('contain', 'CondoBuddy2');
-    cy.get('.cb-subtitle').should('contain', 'Resident Portal');
+    cy.get('.cb-brand').should('contain', 'CondoBuddy');
+    cy.get('.cb-brand-text small').should('contain', 'Resident Portal');
   });
 
-  it('has navigation with all sections', () => {
+  it('has bottom navigation with all resident sections', () => {
     cy.visit('/resident-portal.html');
-    cy.get('.cb-nav').should('be.visible');
-    cy.get('.cb-nav-item').should('have.length.at.least', 5);
-    cy.contains('Dashboard').should('be.visible');
-    cy.contains('Bookings').should('be.visible');
-    cy.contains('Visitors').should('be.visible');
-    cy.contains('Packages').should('be.visible');
-    cy.contains('Access').should('be.visible');
-    cy.contains('CCTV').should('be.visible');
+    cy.get('.cb-tabbar').should('be.visible');
+    cy.get('.cb-tab').should('have.length', 5);
+    cy.get('.cb-tab').contains('Home').should('be.visible');
+    cy.get('.cb-tab').contains('Visitors').should('be.visible');
+    cy.get('.cb-tab').contains('Packages').should('be.visible');
+    cy.get('.cb-tab').contains('Book').should('be.visible');
+    cy.get('.cb-tab').contains('Access').should('be.visible');
   });
 
-  it('switches between sections on nav click', () => {
+  it('does not expose management-only CCTV to residents', () => {
     cy.visit('/resident-portal.html');
-    
-    // Click Bookings
-    cy.contains('Bookings').click();
-    cy.get('#bookings').should('have.class', 'active');
+    cy.get('#cctv').should('not.exist');
+  });
+
+  it('switches between sections on tab click', () => {
+    cy.visit('/resident-portal.html');
+
+    cy.get('.cb-tab').contains('Book').click();
+    cy.get('#bookings').should('have.class', 'is-active');
     cy.get('#bookings').should('contain', 'Facility Booking');
-    
-    // Click Visitors
-    cy.contains('Visitors').click();
-    cy.get('#visitors').should('have.class', 'active');
-    cy.get('#visitors').should('contain', 'Pre-register Visitor');
-    
-    // Click CCTV
-    cy.contains('CCTV').click();
-    cy.get('#cctv').should('have.class', 'active');
-    cy.get('#cctv').should('contain', 'CCTV Feeds');
+
+    cy.get('.cb-tab').contains('Visitors').click();
+    cy.get('#visitors').should('have.class', 'is-active');
+    cy.get('#visitors').should('contain', 'Pre-register a Visitor');
   });
 
   it('booking form has required fields', () => {
     cy.visit('/resident-portal.html');
-    cy.contains('Bookings').click();
-    
+    cy.get('.cb-tab').contains('Book').click();
+
     cy.get('#booking-form').should('be.visible');
     cy.get('#booking-facility').should('exist');
     cy.get('#booking-date').should('have.attr', 'required');
@@ -57,8 +53,8 @@ describe('Resident Portal', () => {
 
   it('visitor form has required fields', () => {
     cy.visit('/resident-portal.html');
-    cy.contains('Visitors').click();
-    
+    cy.get('.cb-tab').contains('Visitors').click();
+
     cy.get('#visitor-form').should('be.visible');
     cy.get('#visitor-name').should('have.attr', 'required');
     cy.get('#visitor-type').should('exist');
@@ -68,8 +64,8 @@ describe('Resident Portal', () => {
     cy.viewport(375, 667); // iPhone SE
     cy.visit('/resident-portal.html');
     cy.get('.cb-portal').should('be.visible');
-    cy.get('.cb-nav').should('be.visible');
-    cy.get('.cb-header h1').should('be.visible');
+    cy.get('.cb-tabbar').should('be.visible');
+    cy.get('.cb-brand').should('be.visible');
   });
 });
 

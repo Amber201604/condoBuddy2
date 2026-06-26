@@ -259,6 +259,42 @@ CCTV streams are **passive RTSP proxies** only. No computer vision, no AI. Alert
 
 ---
 
+## User Interfaces
+
+The platform exposes two role-based views of the same data (per the requirements
+spec): a resident view and a management view.
+
+### Resident Portal — `/resident-portal.html`
+
+A mobile-first web app for residents that surfaces only the functions a resident
+needs:
+
+- **Home** — greeting, quick actions, and at-a-glance counts (expected visitors,
+  packages to collect, upcoming bookings) plus recent activity.
+- **Visitors** — pre-register a guest and instantly get a shareable access pass.
+- **Packages** — parcels held for the unit, with status badges.
+- **Book** — reserve shared facilities and track booking status.
+- **Access** — entry/exit history for the unit.
+
+CCTV and other surveillance functions are intentionally **not** shown here; they
+are management-only. Styling lives in `public/css/condobuddy2.css` and is scoped
+under `.cb-` so it never leaks into the Frappe Desk. The page injects a CSRF
+token (`www/resident-portal.py`) so resident writes (visitor / booking creation)
+work over the session.
+
+### Management Console (Frappe Desk)
+
+A native Frappe **Workspace** ("CondoBuddy2") is shipped as a fixture
+(`fixtures/workspace.json`) so the most-used management functions are listed on
+the Desk homepage:
+
+- **Quick Actions** shortcuts: Visitors, Packages, Facility Bookings, Security
+  Alerts, Access Log, Residents.
+- **Browse by Category** cards: Visitor & Access, Facilities, Packages,
+  Residents & Units, Security & Monitoring.
+
+The workspace syncs automatically on `bench install-app` and `bench migrate`.
+
 ## Mobile — No Separate App Needed
 
 Frappe's web pages are fully responsive. Add to home screen on iOS/Android for a PWA-like experience. If a native app is needed later, Frappe's REST API can power any mobile client.

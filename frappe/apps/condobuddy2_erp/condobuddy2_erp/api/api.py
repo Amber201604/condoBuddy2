@@ -1,15 +1,20 @@
 import frappe
 from frappe import _
 
+
+def _get_session_resident():
+	"""Resolve the Resident record linked to the logged-in user."""
+	user = frappe.session.user
+	resident = frappe.db.get_value("Resident", {"user_account": user}, "name")
+	if not resident:
+		frappe.throw(_("Resident profile not found"))
+	return resident
+
+
 @frappe.whitelist()
 def get_resident_portal_data():
 	"""Get all data for resident portal dashboard"""
-	user = frappe.session.user
-	resident = frappe.db.get_value("Resident", {"user_account": user}, "name")
-	
-	if not resident:
-		frappe.throw(_("Resident profile not found"))
-	
+	resident = _get_session_resident()
 	resident_doc = frappe.get_doc("Resident", resident)
 	unit = resident_doc.unit
 	
@@ -49,7 +54,9 @@ def get_resident_portal_data():
 	
 	return {
 		"resident": {
+			"id": resident,
 			"name": resident_doc.full_name,
+			"first_name": resident_doc.first_name,
 			"unit": unit,
 			"email": resident_doc.email,
 			"phone": resident_doc.phone
@@ -77,17 +84,53 @@ def get_facility_availability(facility, date):
 
 
 @frappe.whitelist()
-def create_visitor(visitor_name, host_resident, visit_type, **kwargs):
-	"""Create a visitor pre-registration"""
+def create_visitor(visitor_name, visit_type="Guest", host_resident=None, **kwargs):
+	"""Create a visitor pre-registration for the logged-in resident."""
+	if not host_resident:
+		host_resident = _get_session_resident()
+
+	allowed = ("visitor_phone", "visitor_email", "expected_arrival", "expected_departure", "notes")
+	extra = {k: v for k, v in kwargs.items() if k in allowed and v}
+
 	visitor = frappe.get_doc({
 		"doctype": "Visitor",
 		"visitor_name": visitor_name,
 		"host_resident": host_resident,
 		"visit_type": visit_type,
-		**kwargs
+		**extra,
 	}).insert()
-	
-	return {"visitor_id": visitor.name, "qr_code": visitor.qr_code}
+
+	return {
+		"visitor_id": visitor.name,
+		"visitor_name": visitor.visitor_name,
+		"qr_code": visitor.qr_code,
+		"status": visitor.status,
+	}
+
+
+@frappe.whitelist()
+def create_booking(facility, booking_date, start_time, end_time, purpose=None, number_of_guests=None):
+	"""Create a facility booking for the logged-in resident."""
+	resident = _get_session_resident()
+	unit = frappe.db.get_value("Resident", resident, "unit")
+
+	booking = frappe.get_doc({
+		"doctype": "Facility Booking",
+		"facility": facility,
+		"resident": resident,
+		"unit": unit,
+		"booking_date": booking_date,
+		"start_time": start_time,
+		"end_time": end_time,
+		"purpose": purpose,
+		"number_of_guests": number_of_guests,
+	}).insert()
+
+	return {
+		"booking_id": booking.name,
+		"facility": booking.facility,
+		"status": booking.status,
+	}
 
 
 @frappe.whitelist()
