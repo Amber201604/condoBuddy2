@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
 
 from app.database import get_db
-from app.core.security import get_current_active_user, require_staff
+from app.core.security import get_current_active_user, require_staff, verify_internal_api_key
 from app.core.websocket import manager
 from app.models import User, Sensor, SensorAlert, utc_now
 from app.schemas import SensorCreate, SensorRead, SensorAlertBase, SensorAlertRead, AlertAcknowledge
@@ -70,6 +70,7 @@ async def sensor_reading(
     sensor_id: UUID,
     reading: dict,
     db: AsyncSession = Depends(get_db),
+    _key: str = Depends(verify_internal_api_key),
 ):
     """Receive sensor reading from IoT gateway."""
     sensor = await get_or_404(db, Sensor, sensor_id, "Sensor not found")

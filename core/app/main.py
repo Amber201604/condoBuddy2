@@ -10,22 +10,23 @@ from app.routers import (
 )
 
 settings = get_settings()
+settings.validate_secret_key()
 
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
     description="CondoBuddy2 Core API — Smart Community Platform",
-    docs_url="/docs",
-    redoc_url="/redoc",
+    docs_url="/docs" if settings.debug else None,
+    redoc_url="/redoc" if settings.debug else None,
 )
 
-# CORS
+# CORS — restrict origins; never combine wildcard with credentials
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure for production
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 # Events

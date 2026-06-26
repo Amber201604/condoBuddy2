@@ -17,6 +17,7 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
+    user_data.role = "resident"  # Self-registration always creates residents
     return await create_user_in_db(db, user_data)
 
 

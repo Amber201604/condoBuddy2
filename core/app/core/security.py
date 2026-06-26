@@ -1,8 +1,8 @@
-"""Security utilities — JWT, password hashing."""
+"""Security utilities — JWT, password hashing, internal API-key auth."""
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, status, Depends, Header
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -10,6 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.database import get_db
+
+ALLOWED_ROLES = {"resident", "staff", "admin"}
 
 settings = get_settings()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -81,3 +83,21 @@ async def require_admin(current_user=Depends(get_current_active_user)):
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user
+
+
+async def verify_internal_api_key(
+    x_api_key: str = Header(..., alias="X-API-Key"),
+) -> str:
+    """Validate the shared internal API key used by devices and services."""
+    expected = get_settings().internal_api_key
+    if not expected:
+        raise HTTPException(
+            status_code=503,
+            detail="Internal API key not configured on server",
+        )
+    if x_api_key != expected:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid API key",
+        )
+    return x_api_key

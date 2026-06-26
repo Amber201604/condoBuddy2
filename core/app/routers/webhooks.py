@@ -1,10 +1,16 @@
 """Webhook router — receives events from Frappe frontend."""
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
-router = APIRouter(prefix="/webhooks", tags=["webhooks"])
+from app.core.security import verify_internal_api_key
+
+router = APIRouter(
+    prefix="/webhooks",
+    tags=["webhooks"],
+    dependencies=[Depends(verify_internal_api_key)],
+)
 
 
 class FacilityBookingWebhook(BaseModel):

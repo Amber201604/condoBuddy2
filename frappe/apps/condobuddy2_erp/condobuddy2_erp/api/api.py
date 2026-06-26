@@ -1,4 +1,5 @@
 import frappe
+import hmac
 from frappe import _
 
 
@@ -10,6 +11,15 @@ def _get_session_resident():
 		frappe.throw(_("Resident profile not found"))
 	return resident
 
+
+def _verify_internal_token():
+	"""Verify the X-API-Key header against the configured internal key."""
+	expected = frappe.conf.get("internal_api_key", "")
+	if not expected:
+		frappe.throw("Internal API key not configured", frappe.AuthenticationError)
+	provided = frappe.request.headers.get("X-API-Key", "")
+	if not hmac.compare_digest(expected, provided):
+		frappe.throw("Invalid API key", frappe.AuthenticationError)
 
 @frappe.whitelist()
 def get_resident_portal_data():
@@ -149,10 +159,16 @@ def get_cctv_feeds():
 @frappe.whitelist(allow_guest=True)
 def receive_iot_alert():
 	"""Webhook endpoint for IoT sensor alerts from core backend"""
+	_verify_internal_token()
 	data = frappe.request.get_json()
 	
+	allowed_types = {"cctv", "iot"}
+	event_type = data.get("type", "iot")
+	if event_type not in allowed_types:
+		event_type = "iot"
+	
 	alert = frappe.get_doc({
-		"doctype": "CCTV Alert" if data.get("type") == "cctv" else "IoT Sensor Event",
+		"doctype": "CCTV Alert" if event_type == "cctv" else "IoT Sensor Event",
 		"camera_id": data.get("device_id"),
 		"camera_location": data.get("location"),
 		"timestamp": data.get("timestamp"),
@@ -166,6 +182,7 @@ def receive_iot_alert():
 @frappe.whitelist(allow_guest=True)
 def receive_access_log():
 	"""Webhook endpoint for access control events from core backend"""
+	_verify_internal_token()
 	data = frappe.request.get_json()
 	
 	log = frappe.get_doc({
