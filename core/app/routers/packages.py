@@ -1,4 +1,5 @@
 """Packages router."""
+import logging
 from typing import List
 from uuid import UUID
 
@@ -12,6 +13,8 @@ from app.core.websocket import manager
 from app.models import User, Package, utc_now
 from app.schemas import PackageCreate, PackageRead, PackagePickup
 from app.services.db_utils import get_or_404, check_resident_access
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/packages", tags=["Packages"])
 
@@ -50,17 +53,20 @@ async def create_package(
     await db.commit()
     await db.refresh(pkg)
 
-    await manager.send_to_user(
-        str(pkg.resident_id),
-        {
-            "type": "package_arrived",
-            "data": {
-                "id": str(pkg.id),
-                "description": pkg.description,
-                "locker_code": pkg.locker_code,
+    try:
+        await manager.send_to_user(
+            str(pkg.resident_id),
+            {
+                "type": "package_arrived",
+                "data": {
+                    "id": str(pkg.id),
+                    "description": pkg.description,
+                    "locker_code": pkg.locker_code,
+                },
             },
-        },
-    )
+        )
+    except Exception as exc:
+        logger.error("Failed to notify resident %s of package arrival: %s", pkg.resident_id, exc)
     return pkg
 
 
@@ -106,15 +112,18 @@ async def notify_resident(
     pkg.notified_at = utc_now()
     await db.commit()
 
-    await manager.send_to_user(
-        str(pkg.resident_id),
-        {
-            "type": "package_notification",
-            "data": {
-                "id": str(pkg.id),
-                "locker_code": pkg.locker_code,
-                "locker_number": pkg.locker_number,
+    try:
+        await manager.send_to_user(
+            str(pkg.resident_id),
+            {
+                "type": "package_notification",
+                "data": {
+                    "id": str(pkg.id),
+                    "locker_code": pkg.locker_code,
+                    "locker_number": pkg.locker_number,
+                },
             },
-        },
-    )
+        )
+    except Exception as exc:
+        logger.error("Failed to send package notification to resident %s: %s", pkg.resident_id, exc)
     return {"message": "Resident notified"}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  TextInput, Modal, RefreshControl,
+  TextInput, Modal, RefreshControl, Alert,
 } from "react-native";
 import { listVisitors, createVisitor } from "../api/client";
 
@@ -28,7 +28,10 @@ export default function VisitorScreen() {
       await createVisitor({ ...form, visit_date: visitDate.toISOString(), expected_duration_minutes: 60 });
       setModalVisible(false);
       load();
-    } catch (e) {}
+    } catch (e: any) {
+      const message = e?.response?.data?.detail || e?.message || "Failed to add visitor";
+      Alert.alert("Visitor Error", message);
+    }
   };
 
   const statusIcon: Record<string, string> = {

@@ -62,7 +62,10 @@ async def grant_access(
     db: AsyncSession = Depends(get_db),
 ):
     """Validate access request and log it. Called by access hardware or mobile app."""
-    user = None
+    import logging
+    _logger = logging.getLogger(__name__)
+
+    user_id = None
     success = False
 
     # Simple validation logic — can be extended with actual NFC/QR validation
@@ -90,9 +93,11 @@ async def grant_access(
             user_id = visitor.resident_id
             # Auto check-in
             visitor.status = "checked_in"
+    else:
+        raise HTTPException(status_code=400, detail=f"Unsupported access method: {request.method}")
 
     log = AccessLog(
-        user_id=user.id if user else None,
+        user_id=user_id,
         entry_point=request.entry_point,
         access_method=request.method,
         direction="entry",
@@ -103,13 +108,16 @@ async def grant_access(
     await db.commit()
     await db.refresh(log)
 
-    if success and user:
-        await manager.send_to_user(
-            str(user.id),
-            {
-                "type": "access_granted",
-                "data": {"entry_point": request.entry_point},
-            },
-        )
+    if success and user_id:
+        try:
+            await manager.send_to_user(
+                str(user_id),
+                {
+                    "type": "access_granted",
+                    "data": {"entry_point": request.entry_point},
+                },
+            )
+        except Exception as exc:
+            _logger.warning("Failed to notify user %s of access grant: %s", user_id, exc)
 
     return {"success": success, "log_id": str(log.id)}

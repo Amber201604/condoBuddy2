@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  TextInput, Modal, RefreshControl,
+  TextInput, Modal, RefreshControl, Alert,
 } from "react-native";
 import { listBookings, createBooking, listFacilities } from "../api/client";
 
@@ -49,7 +49,10 @@ export default function FacilityBookingScreen() {
       await createBooking(form);
       setModalVisible(false);
       load();
-    } catch (e) {}
+    } catch (e: any) {
+      const message = e?.response?.data?.detail || e?.message || "Failed to create booking";
+      Alert.alert("Booking Error", message);
+    }
   };
 
   return (
