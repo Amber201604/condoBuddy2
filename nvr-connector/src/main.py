@@ -4,11 +4,27 @@ No AI detection. Just passes through MJPEG streams.
 """
 import asyncio
 import os
+import re
 from contextlib import asynccontextmanager
+from urllib.parse import urlparse
 
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import StreamingResponse
+
+_RTSP_URL_RE = re.compile(r"^rtsp://[\w.:@/?&=%+-]+$")
+
+
+def _validate_rtsp_url(url: str) -> str:
+    """Reject obviously malicious RTSP URLs before passing to ffmpeg."""
+    parsed = urlparse(url)
+    if parsed.scheme not in ("rtsp", "rtsps"):
+        raise ValueError(f"Unsupported scheme: {parsed.scheme!r}")
+    if not parsed.hostname:
+        raise ValueError("RTSP URL missing hostname")
+    if not _RTSP_URL_RE.match(url):
+        raise ValueError("RTSP URL contains disallowed characters")
+    return url
 
 CAMERA_REGISTRY = {}
 
@@ -34,9 +50,20 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="CondoBuddy2 NVR Connector", lifespan=lifespan)
 
 
+def _require_api_key(x_api_key: str = Header(..., alias="X-API-Key")) -> str:
+    expected = os.getenv("INTERNAL_API_KEY", "")
+    if not expected:
+        raise HTTPException(status_code=503, detail="Internal API key not configured")
+    if x_api_key != expected:
+        raise HTTPException(status_code=401, detail="Invalid API key")
+    return x_api_key
+
+
 @app.post("/cameras/{camera_id}/register")
-async def register_camera(camera_id: str, rtsp_url: str):
+async def register_camera(camera_id: str, rtsp_url: str, _key: str = Header(None, alias="X-API-Key")):
     """Register a camera RTSP URL."""
+    _require_api_key(_key or "")
+    rtsp_url = _validate_rtsp_url(rtsp_url)
     CAMERA_REGISTRY[camera_id] = {"rtsp_url": rtsp_url, "status": "registered"}
     return {"camera_id": camera_id, "status": "registered"}
 

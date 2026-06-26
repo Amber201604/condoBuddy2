@@ -6,21 +6,23 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://condobuddy:condobuddy@postgres:5432/condobuddy2
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-condobuddy}:${POSTGRES_PASSWORD:-condobuddy}@postgres:5432/${POSTGRES_DB:-condobuddy2}
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/1
       - CELERY_RESULT_BACKEND=redis://redis:6379/2
       - MINIO_ENDPOINT=minio:9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD:-minioadmin}
       - MINIO_BUCKET=condobuddy2
       - FRAPPE_BASE_URL=http://frappe:8080
       - NVR_BASE_URL=http://nvr-connector:8001
       - MQTT_BROKER_HOST=mqtt
       - MQTT_BROKER_PORT=1883
-      - SECRET_KEY=change-me-in-production-condobuddy2-secret-key-2024
+      - SECRET_KEY=${SECRET_KEY:?Set SECRET_KEY in .env}
       - ALGORITHM=HS256
-      - ACCESS_TOKEN_EXPIRE_MINUTES=10080
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}
+      - INTERNAL_API_KEY=${INTERNAL_API_KEY:-}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:8080,http://localhost:3000}
     depends_on:
       postgres:
         condition: service_healthy
@@ -37,9 +39,9 @@ services:
     image: postgres:16-alpine
     container_name: condobuddy2-postgres
     environment:
-      - POSTGRES_USER=condobuddy
-      - POSTGRES_PASSWORD=condobuddy
-      - POSTGRES_DB=condobuddy2
+      - POSTGRES_USER=${POSTGRES_USER:-condobuddy}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-condobuddy}
+      - POSTGRES_DB=${POSTGRES_DB:-condobuddy2}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -74,8 +76,8 @@ services:
     container_name: condobuddy2-minio
     command: server /data --console-address ":9001"
     environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
     volumes:
       - minio_data:/data
     ports:
@@ -91,7 +93,7 @@ services:
     container_name: condobuddy2-celery
     command: celery -A app.tasks worker --loglevel=info
     environment:
-      - DATABASE_URL=postgresql+asyncpg://condobuddy:condobuddy@postgres:5432/condobuddy2
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-condobuddy}:${POSTGRES_PASSWORD:-condobuddy}@postgres:5432/${POSTGRES_DB:-condobuddy2}
       - CELERY_BROKER_URL=redis://redis:6379/1
       - CELERY_RESULT_BACKEND=redis://redis:6379/2
     depends_on:
@@ -109,6 +111,8 @@ services:
   #   container_name: condobuddy2-nvr
   #   ports:
   #     - "8001:8001"
+  #   environment:
+  #     - INTERNAL_API_KEY=${INTERNAL_API_KEY:-}
   #   networks:
   #     - condobuddy2
   #   restart: unless-stopped
@@ -123,7 +127,7 @@ services:
       - --skip-character-set-client-handshake
       - --skip-innodb-read-only-compressed
     environment:
-      - MYSQL_ROOT_PASSWORD=condobuddy_mariadb_root
+      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD:-condobuddy_mariadb_root}
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./frappe/docker/mariadb.cnf:/etc/mysql/conf.d/mariadb.cnf
@@ -143,8 +147,14 @@ services:
     ports:
       - "8080:8080"
     environment:
+<<<<<<< HEAD
       - MARIADB_HOST=mariadb
       - MARIADB_ROOT_PASSWORD=condobuddy_mariadb_root
+||||||| parent of ff46bbc (fix: harden security across core, NVR, Frappe, and docker-compose)
+      - MARIADB_ROOT_PASSWORD=condobuddy_mariadb_root
+=======
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD:-condobuddy_mariadb_root}
+>>>>>>> ff46bbc (fix: harden security across core, NVR, Frappe, and docker-compose)
       - CORE_BACKEND_URL=http://core:8000
       - FRAPPE_SITE_NAME=condobuddy2.local
     volumes:

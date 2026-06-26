@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
 
 from app.database import get_db
-from app.core.security import get_current_active_user, require_staff
+from app.core.security import get_current_active_user, require_staff, verify_internal_api_key
 from app.core.websocket import manager
 from app.models import User, LPREvent
 from app.schemas import LPREventCreate, LPREventRead
@@ -40,6 +40,7 @@ async def list_lpr_events(
 async def create_lpr_event(
     data: LPREventCreate,
     db: AsyncSession = Depends(get_db),
+    _key: str = Depends(verify_internal_api_key),
 ):
     """Called by LPR camera system when a plate is detected."""
     # Check if this is a known resident

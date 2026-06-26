@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.database import get_db
-from app.core.security import get_current_active_user, require_staff
+from app.core.security import get_current_active_user, require_staff, verify_internal_api_key
 from app.models import User, Camera, utc_now
 from app.schemas import CameraCreate, CameraRead, CameraUpdate
 from app.services.camera_service import get_stream_proxy
@@ -106,6 +106,7 @@ async def camera_stream(
 async def camera_heartbeat(
     camera_id: UUID,
     db: AsyncSession = Depends(get_db),
+    _key: str = Depends(verify_internal_api_key),
 ):
     """Called by NVR connector or camera agent."""
     cam = await get_or_404(db, Camera, camera_id, "Camera not found")
