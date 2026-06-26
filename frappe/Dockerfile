@@ -13,20 +13,17 @@ USER frappe
 
 WORKDIR /home/frappe
 
-# Stage the custom app source outside the bench dir so `bench init` sees an
-# empty target directory.
-COPY --chown=frappe:frappe ./apps/condobuddy2_erp /home/frappe/condobuddy2_erp
-
-# Initialise the bench (downloads the Frappe framework) and register the custom
-# app at build time. Site creation needs a running MariaDB, so it is deferred to
-# the entrypoint at first container start.
+# Initialise the bench (downloads the Frappe framework) and fetch ERPNext. This
+# layer is independent of the custom app source, so iterating on the custom app
+# does NOT re-trigger the expensive Frappe/ERPNext download + asset build.
+#
+# ERPNext provides the modules (Manufacturing, Buying, Accounts, Projects,
+# Stock, ...) and the `erpnext` python package that the vendored procurement
+# DocTypes in condobuddy2_erp depend on. Must match the Frappe branch.
+# Site creation needs a running MariaDB, so it is deferred to the entrypoint.
 RUN bench init --skip-redis-config-generation --frappe-branch version-15 ${FRAPPE_BENCH_DIR} \
     && cd ${FRAPPE_BENCH_DIR} \
-    # Register the local custom app manually. `bench get-app <path>` chokes on
-    # non-git local sources in this bench version, so we wire it up directly.
-    && cp -r /home/frappe/condobuddy2_erp ${FRAPPE_BENCH_DIR}/apps/condobuddy2_erp \
-    && ${FRAPPE_BENCH_DIR}/env/bin/pip install --no-cache-dir -e ${FRAPPE_BENCH_DIR}/apps/condobuddy2_erp \
-    && printf 'frappe\ncondobuddy2_erp\n' > ${FRAPPE_BENCH_DIR}/sites/apps.txt \
+    && bench get-app --branch version-15 erpnext \
     # Point the bench at the shared external services from docker-compose.
     && bench set-config -g db_host mariadb \
     && bench set-config -g redis_cache "redis://redis:6379/3" \
@@ -36,6 +33,16 @@ RUN bench init --skip-redis-config-generation --frappe-branch version-15 ${FRAPP
     # `bench start` otherwise spawns its own redis processes and serves on 8000.
     && sed -i '/^redis_/d' Procfile \
     && sed -i 's/--port 8000/--port 8080/' Procfile
+
+# Register the local custom app. Placed late so edits only rebuild cheap layers.
+# `bench get-app <path>` chokes on non-git local sources in this bench version,
+# so we wire it up directly.
+COPY --chown=frappe:frappe ./apps/condobuddy2_erp ${FRAPPE_BENCH_DIR}/apps/condobuddy2_erp
+RUN cd ${FRAPPE_BENCH_DIR} \
+    && ${FRAPPE_BENCH_DIR}/env/bin/pip install --no-cache-dir -e ${FRAPPE_BENCH_DIR}/apps/condobuddy2_erp \
+    # Enforce install/load order: frappe -> erpnext -> condobuddy2_erp (the
+    # custom app depends on erpnext doctypes).
+    && printf 'frappe\nerpnext\ncondobuddy2_erp\n' > ${FRAPPE_BENCH_DIR}/sites/apps.txt
 
 WORKDIR ${FRAPPE_BENCH_DIR}
 

@@ -147,14 +147,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-<<<<<<< HEAD
-      - MARIADB_HOST=mariadb
-      - MARIADB_ROOT_PASSWORD=condobuddy_mariadb_root
-||||||| parent of ff46bbc (fix: harden security across core, NVR, Frappe, and docker-compose)
-      - MARIADB_ROOT_PASSWORD=condobuddy_mariadb_root
-=======
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD:-condobuddy_mariadb_root}
->>>>>>> ff46bbc (fix: harden security across core, NVR, Frappe, and docker-compose)
       - CORE_BACKEND_URL=http://core:8000
       - FRAPPE_SITE_NAME=condobuddy2.local
     volumes:

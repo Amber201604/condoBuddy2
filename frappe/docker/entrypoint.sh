@@ -28,6 +28,12 @@ if [ "$1" = "start" ] && [ ! -f "sites/$SITE_NAME/site_config.json" ]; then
     bench use "$SITE_NAME"
     bench --site "$SITE_NAME" set-config condobuddy_core_url "$CORE_BACKEND_URL"
 
+    # ERPNext must be installed before the custom app, which extends its
+    # procurement/manufacturing doctypes (BOM, Purchase Order, GL Entry, ...).
+    echo "Installing erpnext..."
+    bench --site "$SITE_NAME" install-app erpnext \
+        || echo "WARN: install-app erpnext failed; condobuddy2_erp doctypes that depend on it may not work."
+
     echo "Installing condobuddy2_erp..."
     bench --site "$SITE_NAME" install-app condobuddy2_erp \
         || echo "WARN: install-app condobuddy2_erp failed; Frappe framework will still run."
