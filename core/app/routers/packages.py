@@ -9,9 +9,9 @@ from sqlalchemy import select, desc
 from app.database import get_db
 from app.core.security import get_current_active_user, require_staff
 from app.core.websocket import manager
-from app.models import User
-from app.models import Package
+from app.models import User, Package, utc_now
 from app.schemas import PackageCreate, PackageRead, PackagePickup
+from app.services.db_utils import get_or_404, check_resident_access
 
 router = APIRouter(prefix="/packages", tags=["Packages"])
 
@@ -70,12 +70,8 @@ async def get_package(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(select(Package).where(Package.id == pkg_id))
-    pkg = result.scalar_one_or_none()
-    if not pkg:
-        raise HTTPException(status_code=404, detail="Package not found")
-    if current_user.role == "resident" and pkg.resident_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
+    pkg = await get_or_404(db, Package, pkg_id, "Package not found")
+    check_resident_access(current_user, pkg.resident_id)
     return pkg
 
 
@@ -86,17 +82,12 @@ async def pickup_package(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(select(Package).where(Package.id == pkg_id))
-    pkg = result.scalar_one_or_none()
-    if not pkg:
-        raise HTTPException(status_code=404, detail="Package not found")
-    if current_user.role == "resident" and pkg.resident_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
+    pkg = await get_or_404(db, Package, pkg_id, "Package not found")
+    check_resident_access(current_user, pkg.resident_id)
 
     if pkg.locker_code and pkg.locker_code != data.access_code:
         raise HTTPException(status_code=400, detail="Invalid access code")
 
-    from app.models import utc_now
     pkg.status = "picked_up"
     pkg.picked_up_at = utc_now()
     await db.commit()
@@ -109,13 +100,9 @@ async def notify_resident(
     db: AsyncSession = Depends(get_db),
     _: User = Depends(require_staff),
 ):
-    result = await db.execute(select(Package).where(Package.id == pkg_id))
-    pkg = result.scalar_one_or_none()
-    if not pkg:
-        raise HTTPException(status_code=404, detail="Package not found")
+    pkg = await get_or_404(db, Package, pkg_id, "Package not found")
 
     pkg.status = "notified"
-    from app.models import utc_now
     pkg.notified_at = utc_now()
     await db.commit()
 

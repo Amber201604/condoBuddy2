@@ -11,9 +11,9 @@ from sqlalchemy import select, desc
 from app.database import get_db
 from app.core.security import get_current_active_user
 from app.core.websocket import manager
-from app.models import User
-from app.models import Visitor
+from app.models import User, Visitor
 from app.schemas import VisitorCreate, VisitorRead
+from app.services.db_utils import get_or_404, check_resident_access
 
 router = APIRouter(prefix="/visitors", tags=["Visitors"])
 
@@ -66,12 +66,8 @@ async def get_visitor(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(select(Visitor).where(Visitor.id == visitor_id))
-    v = result.scalar_one_or_none()
-    if not v:
-        raise HTTPException(status_code=404, detail="Visitor not found")
-    if current_user.role == "resident" and v.resident_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
+    v = await get_or_404(db, Visitor, visitor_id, "Visitor not found")
+    check_resident_access(current_user, v.resident_id)
     return v
 
 
@@ -81,10 +77,7 @@ async def visitor_check_in(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(select(Visitor).where(Visitor.id == visitor_id))
-    v = result.scalar_one_or_none()
-    if not v:
-        raise HTTPException(status_code=404, detail="Visitor not found")
+    v = await get_or_404(db, Visitor, visitor_id, "Visitor not found")
     v.status = "checked_in"
     await db.commit()
     await manager.send_to_user(
@@ -100,10 +93,7 @@ async def visitor_check_out(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(select(Visitor).where(Visitor.id == visitor_id))
-    v = result.scalar_one_or_none()
-    if not v:
-        raise HTTPException(status_code=404, detail="Visitor not found")
+    v = await get_or_404(db, Visitor, visitor_id, "Visitor not found")
     v.status = "checked_out"
     await db.commit()
     return {"message": "Visitor checked out"}
@@ -115,12 +105,8 @@ async def cancel_visitor(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(select(Visitor).where(Visitor.id == visitor_id))
-    v = result.scalar_one_or_none()
-    if not v:
-        raise HTTPException(status_code=404, detail="Visitor not found")
-    if current_user.role == "resident" and v.resident_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
+    v = await get_or_404(db, Visitor, visitor_id, "Visitor not found")
+    check_resident_access(current_user, v.resident_id)
     v.status = "cancelled"
     await db.commit()
     return {"message": "Visitor cancelled"}

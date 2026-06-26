@@ -9,9 +9,9 @@ from sqlalchemy import select, desc
 from app.database import get_db
 from app.core.security import get_current_active_user, require_staff
 from app.core.websocket import manager
-from app.models import User
-from app.models import Sensor, SensorAlert
+from app.models import User, Sensor, SensorAlert, utc_now
 from app.schemas import SensorCreate, SensorRead, SensorAlertBase, SensorAlertRead, AlertAcknowledge
+from app.services.db_utils import get_or_404
 
 router = APIRouter(prefix="/sensors", tags=["Sensors"])
 
@@ -59,11 +59,7 @@ async def get_sensor(
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(select(Sensor).where(Sensor.id == sensor_id))
-    sensor = result.scalar_one_or_none()
-    if not sensor:
-        raise HTTPException(status_code=404, detail="Sensor not found")
-    return sensor
+    return await get_or_404(db, Sensor, sensor_id, "Sensor not found")
 
 
 @router.post("/{sensor_id}/reading")
@@ -73,13 +69,9 @@ async def sensor_reading(
     db: AsyncSession = Depends(get_db),
 ):
     """Receive sensor reading from IoT gateway."""
-    result = await db.execute(select(Sensor).where(Sensor.id == sensor_id))
-    sensor = result.scalar_one_or_none()
-    if not sensor:
-        raise HTTPException(status_code=404, detail="Sensor not found")
+    sensor = await get_or_404(db, Sensor, sensor_id, "Sensor not found")
 
     sensor.last_reading = reading
-    from app.models import utc_now
     sensor.last_heartbeat = utc_now()
 
     # Auto-detect alert conditions
@@ -164,14 +156,10 @@ async def acknowledge_alert(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_staff),
 ):
-    result = await db.execute(select(SensorAlert).where(SensorAlert.id == alert_id))
-    alert = result.scalar_one_or_none()
-    if not alert:
-        raise HTTPException(status_code=404, detail="Alert not found")
+    alert = await get_or_404(db, SensorAlert, alert_id, "Alert not found")
 
     if data.acknowledge:
         alert.acknowledged_by = current_user.id
-        from app.models import utc_now
         alert.acknowledged_at = utc_now()
     await db.commit()
     return {"message": "Alert acknowledged"}

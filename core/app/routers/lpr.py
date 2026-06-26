@@ -9,9 +9,9 @@ from sqlalchemy import select, desc
 from app.database import get_db
 from app.core.security import get_current_active_user, require_staff
 from app.core.websocket import manager
-from app.models import User
-from app.models import LPREvent
+from app.models import User, LPREvent
 from app.schemas import LPREventCreate, LPREventRead
+from app.services.db_utils import get_or_404
 
 router = APIRouter(prefix="/lpr", tags=["LPR Parking"])
 
@@ -83,11 +83,7 @@ async def get_lpr_event(
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(select(LPREvent).where(LPREvent.id == event_id))
-    event = result.scalar_one_or_none()
-    if not event:
-        raise HTTPException(status_code=404, detail="LPR event not found")
-    return event
+    return await get_or_404(db, LPREvent, event_id, "LPR event not found")
 
 
 @router.post("/{event_id}/mark-stolen")
@@ -96,10 +92,7 @@ async def mark_stolen(
     db: AsyncSession = Depends(get_db),
     _: User = Depends(require_staff),
 ):
-    result = await db.execute(select(LPREvent).where(LPREvent.id == event_id))
-    event = result.scalar_one_or_none()
-    if not event:
-        raise HTTPException(status_code=404, detail="LPR event not found")
+    event = await get_or_404(db, LPREvent, event_id, "LPR event not found")
     event.is_stolen_alert = True
     await db.commit()
 

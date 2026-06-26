@@ -10,28 +10,14 @@ from app.core.security import (
 )
 from app.models import User
 from app.schemas import UserCreate, UserRead, Token, PasswordChange
+from app.services.user_service import create_user_in_db
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(User).where(User.email == user_data.email))
-    if result.scalar_one_or_none():
-        raise HTTPException(status_code=400, detail="Email already registered")
-
-    user = User(
-        email=user_data.email,
-        hashed_password=get_password_hash(user_data.password),
-        full_name=user_data.full_name,
-        phone=user_data.phone,
-        unit_number=user_data.unit_number,
-        role=user_data.role,
-    )
-    db.add(user)
-    await db.commit()
-    await db.refresh(user)
-    return user
+    return await create_user_in_db(db, user_data)
 
 
 @router.post("/login", response_model=Token)
