@@ -7,11 +7,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
 
 from app.database import get_db
-from app.core.security import get_current_user, get_current_active_user, require_staff
+from app.core.security import get_current_active_user, require_staff
 from app.core.websocket import manager
-from app.models import User
-from app.models import WorkOrder
+from app.models import User, WorkOrder
 from app.schemas import WorkOrderCreate, WorkOrderRead, WorkOrderUpdate
+from app.services.db_utils import get_or_404, check_resident_access
 
 router = APIRouter(prefix="/work-orders", tags=["Work Orders"])
 
@@ -71,12 +71,8 @@ async def get_work_order(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(select(WorkOrder).where(WorkOrder.id == wo_id))
-    wo = result.scalar_one_or_none()
-    if not wo:
-        raise HTTPException(status_code=404, detail="Work order not found")
-    if current_user.role == "resident" and wo.resident_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
+    wo = await get_or_404(db, WorkOrder, wo_id, "Work order not found")
+    check_resident_access(current_user, wo.resident_id)
     return wo
 
 
@@ -87,14 +83,8 @@ async def update_work_order(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(select(WorkOrder).where(WorkOrder.id == wo_id))
-    wo = result.scalar_one_or_none()
-    if not wo:
-        raise HTTPException(status_code=404, detail="Work order not found")
-
-    # Residents can only update their own, staff can update any
-    if current_user.role == "resident" and wo.resident_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
+    wo = await get_or_404(db, WorkOrder, wo_id, "Work order not found")
+    check_resident_access(current_user, wo.resident_id)
 
     for field, value in data.model_dump(exclude_unset=True).items():
         setattr(wo, field, value)
@@ -115,12 +105,8 @@ async def delete_work_order(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(select(WorkOrder).where(WorkOrder.id == wo_id))
-    wo = result.scalar_one_or_none()
-    if not wo:
-        raise HTTPException(status_code=404, detail="Work order not found")
-    if current_user.role == "resident" and wo.resident_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
+    wo = await get_or_404(db, WorkOrder, wo_id, "Work order not found")
+    check_resident_access(current_user, wo.resident_id)
 
     await db.delete(wo)
     await db.commit()

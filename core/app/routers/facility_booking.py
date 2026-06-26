@@ -9,12 +9,11 @@ from sqlalchemy import select, and_
 from app.database import get_db
 from app.config import get_settings
 from app.core.security import get_current_active_user
-from app.core.websocket import manager
-from app.models import User
-from app.models import FacilityBooking
+from app.models import User, FacilityBooking
 from app.schemas import (
     FacilityBookingCreate, FacilityBookingRead, FacilityBookingUpdate
 )
+from app.services.db_utils import get_or_404, check_resident_access
 
 router = APIRouter(prefix="/facility-bookings", tags=["Facility Booking"])
 settings = get_settings()
@@ -88,14 +87,8 @@ async def get_booking(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(
-        select(FacilityBooking).where(FacilityBooking.id == booking_id)
-    )
-    booking = result.scalar_one_or_none()
-    if not booking:
-        raise HTTPException(status_code=404, detail="Booking not found")
-    if current_user.role == "resident" and booking.resident_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
+    booking = await get_or_404(db, FacilityBooking, booking_id, "Booking not found")
+    check_resident_access(current_user, booking.resident_id)
     return booking
 
 
@@ -106,14 +99,8 @@ async def update_booking(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(
-        select(FacilityBooking).where(FacilityBooking.id == booking_id)
-    )
-    booking = result.scalar_one_or_none()
-    if not booking:
-        raise HTTPException(status_code=404, detail="Booking not found")
-    if current_user.role == "resident" and booking.resident_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
+    booking = await get_or_404(db, FacilityBooking, booking_id, "Booking not found")
+    check_resident_access(current_user, booking.resident_id)
 
     for field, value in data.model_dump(exclude_unset=True).items():
         setattr(booking, field, value)
@@ -131,14 +118,8 @@ async def cancel_booking(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(
-        select(FacilityBooking).where(FacilityBooking.id == booking_id)
-    )
-    booking = result.scalar_one_or_none()
-    if not booking:
-        raise HTTPException(status_code=404, detail="Booking not found")
-    if current_user.role == "resident" and booking.resident_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
+    booking = await get_or_404(db, FacilityBooking, booking_id, "Booking not found")
+    check_resident_access(current_user, booking.resident_id)
 
     booking.status = "cancelled"
     await db.commit()

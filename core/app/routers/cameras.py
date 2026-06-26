@@ -9,10 +9,10 @@ from sqlalchemy import select
 
 from app.database import get_db
 from app.core.security import get_current_active_user, require_staff
-from app.models import User
-from app.models import Camera
+from app.models import User, Camera, utc_now
 from app.schemas import CameraCreate, CameraRead, CameraUpdate
 from app.services.camera_service import get_stream_proxy
+from app.services.db_utils import get_or_404
 
 router = APIRouter(prefix="/cameras", tags=["CCTV"])
 
@@ -58,11 +58,7 @@ async def get_camera(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    result = await db.execute(select(Camera).where(Camera.id == camera_id))
-    cam = result.scalar_one_or_none()
-    if not cam:
-        raise HTTPException(status_code=404, detail="Camera not found")
-    return cam
+    return await get_or_404(db, Camera, camera_id, "Camera not found")
 
 
 @router.patch("/{camera_id}", response_model=CameraRead)
@@ -72,10 +68,7 @@ async def update_camera(
     db: AsyncSession = Depends(get_db),
     _: User = Depends(require_staff),
 ):
-    result = await db.execute(select(Camera).where(Camera.id == camera_id))
-    cam = result.scalar_one_or_none()
-    if not cam:
-        raise HTTPException(status_code=404, detail="Camera not found")
+    cam = await get_or_404(db, Camera, camera_id, "Camera not found")
     for field, value in data.model_dump(exclude_unset=True).items():
         setattr(cam, field, value)
     await db.commit()
@@ -89,10 +82,7 @@ async def delete_camera(
     db: AsyncSession = Depends(get_db),
     _: User = Depends(require_staff),
 ):
-    result = await db.execute(select(Camera).where(Camera.id == camera_id))
-    cam = result.scalar_one_or_none()
-    if not cam:
-        raise HTTPException(status_code=404, detail="Camera not found")
+    cam = await get_or_404(db, Camera, camera_id, "Camera not found")
     await db.delete(cam)
     await db.commit()
     return {"message": "Camera deleted"}
@@ -105,10 +95,7 @@ async def camera_stream(
     current_user: User = Depends(get_current_active_user),
 ):
     """Proxy MJPEG stream from NVR connector. No AI processing."""
-    result = await db.execute(select(Camera).where(Camera.id == camera_id))
-    cam = result.scalar_one_or_none()
-    if not cam:
-        raise HTTPException(status_code=404, detail="Camera not found")
+    cam = await get_or_404(db, Camera, camera_id, "Camera not found")
 
     # Return redirect to NVR connector stream URL or proxy it
     stream_url = cam.stream_url or f"http://nvr-connector:8001/stream/{camera_id}"
@@ -121,12 +108,8 @@ async def camera_heartbeat(
     db: AsyncSession = Depends(get_db),
 ):
     """Called by NVR connector or camera agent."""
-    result = await db.execute(select(Camera).where(Camera.id == camera_id))
-    cam = result.scalar_one_or_none()
-    if not cam:
-        raise HTTPException(status_code=404, detail="Camera not found")
+    cam = await get_or_404(db, Camera, camera_id, "Camera not found")
     cam.status = "online"
-    from app.models import utc_now
     cam.last_heartbeat = utc_now()
     await db.commit()
     return {"message": "Heartbeat received"}
